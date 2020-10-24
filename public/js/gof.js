@@ -1,11 +1,11 @@
 let iterations = 0
 let map = new Array()
-let size = 40
+let size = 20
 let columns;
 let rows;
 let started = true
 let next = new Array()
-let savings = new Array();
+let buffer = new Array();
 
 document.querySelector(".reset").addEventListener("click", (e) => {
 	iterations = 0;
@@ -41,17 +41,6 @@ document.querySelector(".fill").addEventListener("click", (e) => {
 	}
 })
 
-document.querySelector(".save").addEventListener("click", (e) => {
-	if (started === false) {
-		saveMap()
-	}
-})
-
-document.querySelector(".load").addEventListener("click", (e) => {
-	if (started === false) {
-		loadMap()
-	}
-})
 
 function setup() {
 	frameRate(40)
@@ -59,7 +48,8 @@ function setup() {
 	started = false
 	columns = floor((window.innerWidth - 50) / size)
 	rows = floor((window.innerHeight - 130) / size)
-	createCanvas(size * columns, size * rows);	
+	let mycanvas = createCanvas(size * columns, size * rows);	
+	mycanvas.parent("mycanvas");
 	initMap();
 }
 
@@ -192,11 +182,29 @@ function buildNext(i, j) { //enfer
 
 }
 
+function handleDraw() {
+	let pair = {}
+	pair.x = floor(mouseY / size)
+	pair.y = floor(mouseX / size)
+	buffer.length === 0 ? buffer.push(pair) : ""
+
+	if (buffer[buffer.length - 1].x != pair.x || buffer[buffer.length - 1].y != pair.y) {
+		buffer.push(pair)
+		map[pair.x][pair.y] = !map[pair.x][pair.y]
+		singlePass()
+	} 
+}
+
+function mouseDragged() {
+	handleDraw()
+}
+
+function mouseReleased() {
+	buffer = []
+}
 
 
 function mouseClicked() {
-
-
 	let x = floor(mouseY / size)
 	let y = floor(mouseX / size)
 	if ((x > 0 && x < columns * size) && (y > 0 && y < rows * size))
