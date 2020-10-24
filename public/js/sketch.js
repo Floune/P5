@@ -7,17 +7,6 @@ let ants = [];
 let diam = 30;
 
 
-document.querySelector("#reset").addEventListener("click", e => {
-		let newTot = document.querySelector("#total").value * 10
-		let newDiam = document.querySelector("#diam").value * 10
-		let newSpeed = document.querySelector("#speed").value
-		total = newTot
-		diam = newDiam
-		velocity = newSpeed
-		updateAnts(newTot);
-		init()
-})
-
 
 function setup() {
 	createCanvas(window.innerWidth, window.innerHeight);	
