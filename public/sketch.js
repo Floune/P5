@@ -1,22 +1,27 @@
 let total = 200;
+let velocity = 1;
 let spring = 0.05;
 let gravity = 0.03;
 let friction = -0.9;
 let ants = [];
+let diam = 30;
+
+
+document.querySelector("#reset").addEventListener("click", e => {
+		let newTot = document.querySelector("#total").value * 10
+		let newDiam = document.querySelector("#diam").value * 10
+		let newSpeed = document.querySelector("#speed").value
+		total = newTot
+		diam = newDiam
+		velocity = newSpeed
+		updateAnts(newTot);
+		init()
+})
+
 
 function setup() {
-	createCanvas(window.innerWidth, window.innerHeight);
-	
-	for (let i = 0; i < total; i++) {
-		ants[i] = new Ball(
-			random(width),
-			random(height),
-			30,
-			i,
-			ants,
-			Math.random() < 0.5 ? "red" : "blue",
-			);
-	}
+	createCanvas(window.innerWidth, window.innerHeight);	
+	updateAnts(total)
 }
 
 function draw() {
@@ -31,13 +36,31 @@ function draw() {
 
 }
 
+function updateAnts(newTot) {
+	console.log(ants)
+	ants.length = 0;
+	ants = []
+	console.log(ants)
+	
+	for (let i = 0; i < newTot; i++) {
+		ants[i] = new Ball(
+			random(width),
+			random(height),
+			diam,
+			i,
+			ants,
+			Math.random() < 0.5 ? "red" : "blue",
+			);
+	}
+}
+
 class Ball {
 	constructor(xin, yin, din, idin, oin, team) {
 		this.team = team;
 		this.x = xin;
 		this.y = yin;
-		this.vx = Math.random() < 0.5 ? -2 : 2;
-		this.vy = Math.random() < 0.5 ? -2 : 2;
+		this.vx = Math.random() < 0.5 ? velocity * -1 : velocity;
+		this.vy = Math.random() < 0.5 ? velocity * -1 : velocity;
 		this.diameter = din;
 		this.id = idin;
 		this.others = oin;
@@ -65,17 +88,17 @@ class Ball {
 				this.others[i].vx += ax;
 				this.others[i].vy += ay;
 			}
-			if (this.x < 15) {
-				this.vx = 2;
+			if (this.x < this.diameter / 2) {
+				this.vx = velocity;
 			}
-			if (this.x > window.innerWidth - 15) {
-				this.vx = -2;
+			if (this.x > window.innerWidth - this.diameter / 2) {
+				this.vx = velocity * -1;
 			}
 			if (this.y < 15 ) {
-				this.vy  = 2;
+				this.vy  = velocity;
 			}
-			if (this.y > window.innerHeight - 15) {
-				this.vy = -2;
+			if (this.y > window.innerHeight - this.diameter / 2) {
+				this.vy = velocity * -1;
 			}
 
 		}
