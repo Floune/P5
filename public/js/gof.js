@@ -200,6 +200,11 @@ function mouseDragged() {
 }
 
 function mouseReleased() {
+	let pair = {}
+	pair.x = floor(mouseY / size)
+	pair.y = floor(mouseX / size)
+	map[pair.x][pair.y] = !map[pair.x][pair.y]
+	singlePass()
 	buffer = []
 }
 
