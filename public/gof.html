@@ -4,22 +4,37 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>game of life</title>
-    <link rel="stylesheet" href="css/gof.css">
-    <script src="js/p5.js"></script>
+	<link rel="stylesheet" href="css/gof.css">
+	<script src="js/p5.js"></script>
 </head>
 <body>
-	<div class="toolbar">
-		<button class="reset">random reset</button><button class="stop">stop</button><button class="start">start</button><button class="erase">erase</button><button class="fill">fill</button>
+	<div class="container">
+		<div class="toolbar">
+			<div class="boutons">
+				<a href="#" data-attribute ="" class="bouton reset">random reset</a>
+				<a href="#" data-attribute ="" class="bouton stop">stop</a>
+				<a href="#" data-attribute ="" class="bouton start">start</a>
+				<a href="#" data-attribute ="" class="bouton erase">erase</a>
+				<a href="#" data-attribute ="" class="bouton fill">fill</a>
+				<a href="#" data-attribute ="" class="bouton save">save state</a>
+				<a href="#" data-attribute ="" class="bouton load">load state</a>
+				<input type="color" class="gridcolor bouton">
+			</div>
+
+			<div class="infos">
+				<div>
+					<span class="iterations"></span>
+				</div>	 		
+				<div class="status"></div>
+			</div>
+		</div>
+
+		<div id="mycanvas"></div>
+
+
+		<a href="index.html">retour</a>
 	</div>
-
-	<div id="mycanvas"></div>
-
-	<div class="infos">
-	status: <span class="status"></span> | nombre d'itérations: <span class="iterations"></span>		
-	</div>
-	 <a href="index.html">retour</a>
-
-    <script src="js/gof.js"></script>
+	<script src="js/gof.js"></script>
 
 </body>
 </html>

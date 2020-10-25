@@ -1,16 +1,20 @@
 let iterations = 0
 let map = new Array()
-let size = 50
+let size = 20
 let columns;
 let rows;
 let started = true
 let next = new Array()
 let buffer = new Array();
+let gridColor = "#F11085"
+let history = []
 
 document.querySelector(".reset").addEventListener("click", (e) => {
 	iterations = 0;
 	initMap()
 	started = false
+	singlePass()
+	updateHud()
 	noLoop()
 })
 
@@ -31,14 +35,35 @@ document.querySelector(".start").addEventListener("click", (e) => {
 document.querySelector(".erase").addEventListener("click", (e) => {
 	if (started === false){
 		iterations = 0;
+		updateHud()
 		eraseMap()
 	}
 })
 
 document.querySelector(".fill").addEventListener("click", (e) => {
 	if (started === false) {
+		iterations = 0
+		updateHud()
 		fillMap()
 	}
+})
+
+document.querySelector(".save").addEventListener("click", (e) => {
+	storeItem("lifemap", map)
+})
+
+document.querySelector(".load").addEventListener("click", (e) => {
+	if (started === false) {
+		let tmp = getItem("lifemap")
+		map = getItem("lifemap")
+		next = getItem("lifemap")
+	}
+	singlePass()
+})
+
+document.querySelector(".gridcolor").addEventListener("change", e => {
+	gridColor = e.target.value
+	singlePass();
 })
 
 
@@ -56,10 +81,22 @@ function setup() {
 
 function draw() {
 	background(0);
-	document.querySelector(".status").innerHTML = started === true ? "started" : "stopped"
-	document.querySelector(".iterations").innerHTML = iterations
+	updateHud()
 	updateMap()
 	drawMap()
+}
+
+function updateHud() {
+	let status = document.querySelector(".status")
+	if (started === true) {
+		status.classList.remove("stopped")
+		status.classList.add("started")
+	}
+	else {
+		status.classList.remove("started")
+		status.classList.add("stopped")
+	} 
+	document.querySelector(".iterations").innerHTML = iterations
 }
 
 function drawMap() {
@@ -69,7 +106,8 @@ function drawMap() {
 			if (map[i][j] === false)
 				fill("white")
 			else
-				fill("black")
+				fill(gridColor)	
+			stroke(gridColor)
 			rect(j * size, i * size, size-1, size-1);		
 		}
 	}
@@ -89,9 +127,8 @@ function initMap() {
 
 }
 
-
 function updateMap() {
-	iterations++;
+	iterations++; 
 	for (let i = 0; i < rows; i++) {
 		for (let j = 0; j < columns; j++) {
 			next[i][j] = buildNext(i, j)
@@ -179,7 +216,7 @@ function mouseReleased() {
 }
 
 
-function mouseClicked() {
+function mousePressed() {
 	let x = floor(mouseY / size)
 	let y = floor(mouseX / size)
 	if ((x >= 0 && mouseX <= columns * size) && (y >= 0 && mouseY <= rows * size)){
@@ -194,7 +231,8 @@ function singlePass() {
 			if (map[i][j] === false)
 				fill("white")
 			else
-				fill("black")
+				fill(gridColor)
+			stroke(gridColor)
 			rect(j * size, i * size, size-1, size-1);		
 		}
 	}
