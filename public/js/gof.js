@@ -1,6 +1,6 @@
 let iterations = 0
 let map = new Array()
-let size = 20
+let size = 40
 let columns;
 let rows;
 let started = true
@@ -8,6 +8,7 @@ let next = new Array()
 let buffer = new Array();
 let gridColor = "#F11085"
 let history = []
+let framerate = 40
 
 document.querySelector(".reset").addEventListener("click", (e) => {
 	iterations = 0;
@@ -67,9 +68,40 @@ document.querySelector(".gridcolor").addEventListener("change", e => {
 })
 
 
+document.querySelector(".size").addEventListener("change", e => {
+	if (started === false) {
+		size = e.target.value
+		columns = floor((window.innerWidth - 50) / size)
+		rows = floor((window.innerHeight - 130) / size)
+		let mycanvas = createCanvas(size * columns, size * rows);	
+		initMap();
+	 	singlePass();
+	}
+})
+
+function mouseDragged() {
+	handleDraw()
+}
+
+function mouseReleased() {
+	singlePass()
+	buffer = []
+}
+
+
+function mousePressed() {
+	let x = floor(mouseY / size)
+	let y = floor(mouseX / size)
+	if ((x >= 0 && mouseX <= columns * size) && (y >= 0 && mouseY <= rows * size)){
+		map[x][y] = !map[x][y]
+	}
+	singlePass()
+}
+
+
 function setup() {
 	noLoop()
-	frameRate(40)
+	frameRate(framerate)
 	started = false
 	columns = floor((window.innerWidth - 50) / size)
 	rows = floor((window.innerHeight - 130) / size)
@@ -206,24 +238,7 @@ function handleDraw() {
 	} 
 }
 
-function mouseDragged() {
-	handleDraw()
-}
 
-function mouseReleased() {
-	singlePass()
-	buffer = []
-}
-
-
-function mousePressed() {
-	let x = floor(mouseY / size)
-	let y = floor(mouseX / size)
-	if ((x >= 0 && mouseX <= columns * size) && (y >= 0 && mouseY <= rows * size)){
-		map[x][y] = !map[x][y]
-	}
-	singlePass()
-}
 
 function singlePass() {
 	for (let i = 0; i < rows; i++) {
