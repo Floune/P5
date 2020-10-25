@@ -1,6 +1,6 @@
 let iterations = 0
 let map = new Array()
-let size = 20
+let size = 50
 let columns;
 let rows;
 let started = true
@@ -43,36 +43,16 @@ document.querySelector(".fill").addEventListener("click", (e) => {
 
 
 function setup() {
-	frameRate(40)
 	noLoop()
+	frameRate(40)
 	started = false
 	columns = floor((window.innerWidth - 50) / size)
 	rows = floor((window.innerHeight - 130) / size)
 	let mycanvas = createCanvas(size * columns, size * rows);	
-	mycanvas.parent("mycanvas");
 	initMap();
+	mycanvas.parent("mycanvas");
 }
 
-function saveMap() {
-	let allStorage = {...localStorage}
-	for (const [key, value] of Object.entries(allStorage)) {
-		if (key.startsWith("map")) {
-			savings.push(value)
-		}
-	}
-	storeItem("map-" + savings.length + 1, map)
-}
-
-function loadMap() {
-	let allStorage = {...localStorage}
-	for (const [key, value] of Object.entries(allStorage)) {
-		if (key.startsWith("map")) {
-			var btn = document.createElement("BUTTON");
-			btn.innerHTML = key;
-			document.querySelector(".toolbar").appendChild(btn); 
-		}
-	}
-}
 
 function draw() {
 	background(0);
@@ -102,11 +82,7 @@ function initMap() {
 	}
 	for (let i = 0; i < rows; i++) {
 		for (let j = 0; j < columns; j++) {
-			if (i === 0 || j === 0 || i === rows -1 || j === columns -1) {
-				map[i][j] = false;
-			} else {
-				map[i][j] = floor(random(0, 2)) === 1 ? true : false
-			}
+			map[i][j] = floor(random(0, 2)) === 0 ? true : false
 			next[i][j] = false;
 		}
 	}
@@ -116,8 +92,8 @@ function initMap() {
 
 function updateMap() {
 	iterations++;
-	for (let i = 0; i < rows - 1; i++) {
-		for (let j = 0; j < columns - 1; j++) {
+	for (let i = 0; i < rows; i++) {
+		for (let j = 0; j < columns; j++) {
 			next[i][j] = buildNext(i, j)
 		}
 	}
@@ -139,7 +115,7 @@ function buildNext(i, j) { //enfer
 			neighbours++;
 	}
 
-	if (i !== 0 && j !== columns) {
+	if (i !== 0 && j !== columns - 1) {
 		if (map[i-1][j+1] === true)
 			neighbours++;
 	}
@@ -149,23 +125,21 @@ function buildNext(i, j) { //enfer
 			neighbours++;
 	}
 
-	if (j !== columns) {
+	if (j !== columns - 1) {
 		if (map[i][j+1] === true)
 			neighbours++;
 	}
 
-	if (i !== rows && j !== 0) {
+	if (i !== rows - 1 && j !== 0) {
 		if (map[i+1][j-1] === true)
 			neighbours++;
 	}
-
-
-	if (i !== rows) {
+	if (i !== rows -1) {
 		if (map[i+1][j] === true)
 			neighbours++;
 	}
 
-	if (i !== rows && j !== columns) {
+	if (i !== rows - 1 && j !== columns - 1) {
 		if (map[i+1][j+1] === true)
 			neighbours++;
 	}
@@ -200,10 +174,6 @@ function mouseDragged() {
 }
 
 function mouseReleased() {
-	let pair = {}
-	pair.x = floor(mouseY / size)
-	pair.y = floor(mouseX / size)
-	map[pair.x][pair.y] = !map[pair.x][pair.y]
 	singlePass()
 	buffer = []
 }
@@ -212,8 +182,9 @@ function mouseReleased() {
 function mouseClicked() {
 	let x = floor(mouseY / size)
 	let y = floor(mouseX / size)
-	if ((x > 0 && x < columns * size) && (y > 0 && y < rows * size))
+	if ((x >= 0 && mouseX <= columns * size) && (y >= 0 && mouseY <= rows * size)){
 		map[x][y] = !map[x][y]
+	}
 	singlePass()
 }
 
