@@ -7,6 +7,7 @@ let started = true
 let next = new Array()
 let buffer = new Array();
 let gridColor = "#F11085"
+let bgColor = "#F11085"
 let history = []
 let framerate = 40
 
@@ -64,6 +65,7 @@ document.querySelector(".load").addEventListener("click", (e) => {
 
 document.querySelector(".gridcolor").addEventListener("change", e => {
 	gridColor = e.target.value
+	document.body.style.backgroundColor = e.target.value;
 	singlePass();
 })
 
@@ -104,7 +106,7 @@ function setup() {
 	frameRate(framerate)
 	started = false
 	columns = floor((window.innerWidth - 50) / size)
-	rows = floor((window.innerHeight - 130) / size)
+	rows = floor((window.innerHeight - 110) / size)
 	let mycanvas = createCanvas(size * columns, size * rows);	
 	initMap();
 	mycanvas.parent("mycanvas");
@@ -112,7 +114,6 @@ function setup() {
 
 
 function draw() {
-	background(0);
 	updateHud()
 	updateMap()
 	drawMap()
