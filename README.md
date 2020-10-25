@@ -1,4 +1,4 @@
-### Instructions pour mehdi
+### Instructions
 
 - npm install
 - node index.js
