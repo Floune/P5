@@ -11,7 +11,7 @@ let gridColor = "black"
 let emptyColor = "black"
 let fullColor = "white"
 let history = []
-let fr = 30
+let fr = 25
 let grid = true
 var zoom = 1.00;
 var zMin = 0.05;
@@ -88,7 +88,7 @@ function gen(gridSize = null) {
 	if (started === false) {
 		if (gridSize !== null) {
 			columns = floor(parseInt(gridSize))
-			rows = floor((parseInt(gridSize) / 16) * 9)
+			rows = floor((parseInt(gridSize) / 16) * 8)
 		} else {
 			columns = floor((window.innerWidth - 50) / size)
 			rows = floor((window.innerHeight - 110) / size)
