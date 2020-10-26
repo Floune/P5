@@ -345,7 +345,7 @@ function stepGame() {
 function canon() {
 	console.log(map[0].length, map.length)
 	if (map[0].length > 36 && map.length > 14) {
-		for (let i = 0; i < 12; i ++) {
+		for (let i = 0; i < rows; i ++) {
 			for (let j = 0; j < columns; j++) {
 				map[i][j] = false
 			}	
