@@ -342,6 +342,57 @@ function stepGame() {
 	singlePass()
 }
 
+function canon() {
+	console.log(map[0].length, map.length)
+	if (map[0].length > 36 && map.length > 14) {
+		for (let i = 0; i < 12; i ++) {
+			for (let j = 0; j < columns; j++) {
+				map[i][j] = false
+			}	
+		}
+		map[0][24] = true
+		map[1][22] = true
+		map[1][24] = true
+		map[2][20] = true
+		map[2][21] = true
+		map[2][34] = true
+		map[2][35] = true
+		map[2][13] = true
+		map[2][12] = true
+		map[3][20] = true
+		map[3][21] = true
+		map[3][34] = true
+		map[3][35] = true
+		map[3][15] = true
+		map[3][11] = true
+		map[4][0] = true
+		map[4][1] = true
+		map[4][10] = true
+		map[4][16] = true
+		map[4][20] = true
+		map[4][21] = true
+		map[5][0] = true
+		map[5][1] = true
+		map[5][10] = true
+		map[5][14] = true
+		map[5][16] = true
+		map[5][17] = true
+		map[5][22] = true
+		map[5][24] = true
+		map[6][10] = true
+		map[6][16] = true
+		map[6][24] = true
+		map[7][11] = true
+		map[7][15] = true
+		map[8][12] = true
+		map[8][13] = true
+		singlePass()
+
+	} else {
+		notify("warning", "map too small", 4000)
+	}
+	
+}
 
 function notify(type, message, duration) {
 	let options = {}

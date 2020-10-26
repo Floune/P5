@@ -129,6 +129,10 @@ body {
 	background-image: url("/img/step.png")
 }
 
+.bouton-canon {
+	background-image: url("/img/gun.png")
+}
+
 
 .slider {
 	margin-left: 10px;
