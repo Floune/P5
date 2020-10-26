@@ -9,9 +9,9 @@ let next = new Array()
 let buffer = new Array();
 let gridColor = "black"
 let emptyColor = "black"
-let fullColor = "white"
+let fullColor = "#2CFE02"
 let history = []
-let fr = 25
+let fr = 30
 let grid = true
 var zoom = 1.00;
 var zMin = 0.05;
@@ -324,8 +324,8 @@ function changeWidth(e) {
 
 
 function swapColors() {
-	emptyColor = emptyColor === "white" ? "black" : "white";
-	fullColor = fullColor === "white" ? "black" : "white";
+	emptyColor = emptyColor === "#2CFE02" ? "black" : "#2CFE02";
+	fullColor = fullColor === "#2CFE02" ? "black" : "#2CFE02";
 	singlePass()
 }
 
@@ -337,6 +337,10 @@ function zoomout(e) {
 
 }
 
+function stepGame() {
+	updateMap()
+	singlePass()
+}
 
 
 function notify(type, message, duration) {
