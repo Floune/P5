@@ -8,9 +8,11 @@ let started = true
 let next = new Array()
 let buffer = new Array();
 let gridColor = "black"
-let bgColor = "black"
+let emptyColor = "black"
+let fullColor = "white"
 let history = []
-let framerate = 30
+let fr = 30
+let grid = true
 const actions = document.querySelectorAll('[data-action]')
 
 
@@ -21,12 +23,11 @@ actions.forEach(a => {
 })
 
 function setup() {
+	frameRate(fr)
 	noLoop()
-	frameRate(framerate)
 	started = false
 	let canvas = gen()	
 	initMap();
-	canvas.parent("mycanvas");
 }
 
 
@@ -40,7 +41,7 @@ function gen() {
 	columns = floor((window.innerWidth - 50) / size)
 	rows = floor((window.innerHeight - 110) / size)
 	let mycanvas = createCanvas(size * columns, size * rows);
-	return mycanvas;
+	mycanvas.parent("mycanvas");
 }
 
 function updateHud() {
@@ -60,10 +61,10 @@ function drawMap() {
 	for (let i = 0; i < rows; i++) {
 		for (let j = 0; j < columns; j++) {
 			if (map[i][j] === false)
-				fill("black")
+				fill(emptyColor)
 			else
-				fill("white")	
-			stroke("black")
+				fill(fullColor)	
+			stroke(gridColor)
 			rect(j * size, i * size, size-1, size-1);		
 		}
 	}
@@ -153,13 +154,16 @@ function handleDraw() {
 	let pair = {}
 	pair.x = floor(mouseY / size)
 	pair.y = floor(mouseX / size)
-	buffer.length === 0 ? buffer.push(pair) : ""
+	if ((pair.x >= 0 && mouseX <= columns * size) && (pair.y >= 0 && mouseY <= rows * size)){
 
-	if (buffer[buffer.length - 1].x != pair.x || buffer[buffer.length - 1].y != pair.y) {
-		buffer.push(pair)
-		map[pair.x][pair.y] = !map[pair.x][pair.y]
-		singlePass()
-	} 
+		buffer.length === 0 ? buffer.push(pair) : ""
+
+		if (buffer[buffer.length - 1].x != pair.x || buffer[buffer.length - 1].y != pair.y) {
+			buffer.push(pair)
+			map[pair.x][pair.y] = !map[pair.x][pair.y]
+			singlePass()
+		} 
+	}
 }
 
 
@@ -168,10 +172,10 @@ function singlePass() {
 	for (let i = 0; i < rows; i++) {
 		for (let j = 0; j < columns; j++) {
 			if (map[i][j] === false)
-				fill("black")
+				fill(emptyColor)
 			else
-				fill("white")
-			stroke("black")
+				fill(fullColor)
+			stroke(gridColor)
 			rect(j * size, i * size, size-1, size-1);		
 		}
 	}
@@ -187,6 +191,8 @@ function eraseMap() {
 			}
 		}
 		singlePass()
+	} else {
+		notify("warning", "Game still running", 4000)
 	}
 }
 
@@ -200,6 +206,8 @@ function fillMap() {
 			}
 		}
 		singlePass()
+	} else {
+		notify("warning", "Game still running", 4000)
 	}
 
 }
@@ -237,6 +245,7 @@ function startGame(e) {
 
 function saveState(e) {
 	storeItem("lifemap", map)
+	notify("success", "Board saved", 4000)
 }
 
 function loadState(e) {
@@ -246,6 +255,7 @@ function loadState(e) {
 		next = getItem("lifemap")
 	}
 	singlePass()
+	notify("success", "Board loaded", 4000)
 }
 
 document.querySelector(".size").addEventListener("change", e => {
@@ -257,6 +267,13 @@ document.querySelector(".size").addEventListener("change", e => {
 	}
 })
 
+document.querySelector(".framerate").addEventListener("change", e => {
+	console.log(frameRate())
+	frameRate(parseInt(e.target.value))
+	console.log(frameRate())
+
+})
+
 function mouseDragged() {
 	handleDraw()
 }
@@ -264,6 +281,12 @@ function mouseDragged() {
 function mouseReleased() {
 	singlePass()
 	buffer = []
+}
+
+function swapColors() {
+	emptyColor = emptyColor === "white" ? "black" : "white";
+	fullColor = fullColor === "white" ? "black" : "white";
+	singlePass()
 }
 
 
@@ -275,3 +298,16 @@ function mousePressed() {
 	}
 	singlePass()
 }
+
+function notify(type, message, duration) {
+	let options = {}
+	options.labels = {
+		success: "Amazing",
+		warning: "Beware"
+	}
+	options.durations = {
+		global: duration,
+	}
+	type === "success" ? window.notifier.success(message, options) : window.notifier.warning(message, options)
+}
+

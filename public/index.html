@@ -6,6 +6,8 @@
   <title>game of life</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="css/gof.css">
+  <link rel="stylesheet" href="notif/style.css"></link>
+  <script src="notif/index.var.js"></script>
   <script src="js/p5.js"></script>
 </head>
 <body>
@@ -18,17 +20,18 @@
         <div class="status"></div>
       </div>
       <div class="boutons">
+        <input id="size" min="2" max="300" type="number" class="size" value="40">
         <button title="Play" data-action ="startGame" class="bouton bouton-play reset"></button>
         <button title="Pause" data-action ="stopGame" class="bouton bouton-stop stop"></button>
         <button title="Reset" data-action ="resetMap" class="bouton bouton-reset reset"></button>
         <button title="Erase" data-action ="eraseMap" class="bouton bouton-erase erase"></button>
         <button title="Fill" data-action ="fillMap" class="bouton bouton-fill fill"></button>
+        <button title="Swap !" data-action ="swapColors" class="bouton bouton-swap swap"></button>
         <button title="Save state" data-action ="saveState" class="bouton bouton-save save"></button>
         <button title="Load state" data-action ="loadState" class="bouton bouton-load load"></button>
         <button title="Zoom in" data-action ="zoomin" class="bouton bouton-zoomin zoomin"></button>
         <button title="Zoom out" data-action ="zoomout" class="bouton bouton-zoomout zoomout"></button>
-        <input id="size" min="2" max="300" type="number" class="size" value="40">
-
+        <input type="range" min="2" max="40" step="1" value="25" class="slider framerate">
       </div>
 
     </div>
@@ -36,6 +39,8 @@
     <div id="mycanvas"></div>
   </div>
   <script src="js/gof.js"></script>
-
+  <script>
+    window.notifier = new AWN();
+  </script>
 </body>
 </html>
