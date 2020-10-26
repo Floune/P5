@@ -20,7 +20,7 @@
         <div class="status"></div>
       </div>
       <div class="boutons">
-        <input id="size" min="2" max="300" type="number" class="size" value="40">
+        <input id="size" data-change="squareSize" min="2" max="300" type="number" class="size number" value="40">
         <button title="Play" data-action ="startGame" class="bouton bouton-play reset"></button>
         <button title="Pause" data-action ="stopGame" class="bouton bouton-stop stop"></button>
         <button title="Reset" data-action ="resetMap" class="bouton bouton-reset reset"></button>
@@ -31,7 +31,8 @@
         <button title="Load state" data-action ="loadState" class="bouton bouton-load load"></button>
         <button title="Zoom in" data-action ="zoomin" class="bouton bouton-zoomin zoomin"></button>
         <button title="Zoom out" data-action ="zoomout" class="bouton bouton-zoomout zoomout"></button>
-        <input type="range" min="2" max="40" step="1" value="25" class="slider framerate">
+        <input type="range" data-change="changeFramerate" min="2" max="40" step="1" value="25" class="slider framerate">
+        <input id="widz" data-change="changeWidth" type="number" class="width number" value="40">
       </div>
 
     </div>

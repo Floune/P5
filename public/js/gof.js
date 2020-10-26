@@ -13,14 +13,60 @@ let fullColor = "white"
 let history = []
 let fr = 30
 let grid = true
+var zoom = 1.00;
+var zMin = 0.05;
+var zMax = 9.00;
+var sensativity = 0.4;
 const actions = document.querySelectorAll('[data-action]')
+const changes = document.querySelectorAll('[data-change]')
 
+//================Listeners==============================================================//
 
-actions.forEach(a => {
+actions.forEach(a => {																	 
 	a.addEventListener("click", e => {
 		bindClickButtons(e)
 	})
 })
+
+changes.forEach(c => {
+	c.addEventListener("change", e => {
+		bindChangeButtons(e)
+	})
+})
+
+function bindClickButtons(e) {
+	const action = e.currentTarget.getAttribute("data-action")
+	if (typeof window[action] === "function") {
+		window[action](e.currentTarget)
+	}
+}
+
+function bindChangeButtons(e) {
+	const change = e.currentTarget.getAttribute("data-change")
+	if (typeof window[change] === "function") {
+		window[change](e.currentTarget)
+	}
+}
+
+function mouseDragged() {
+	handleDraw()
+}
+
+function mouseReleased() {
+	singlePass()
+	buffer = []
+}
+
+function mousePressed() {
+	let x = floor(mouseY / size)
+	let y = floor(mouseX / size)
+	if ((x >= 0 && mouseX <= columns * size) && (y >= 0 && mouseY <= rows * size)){
+		map[x][y] = !map[x][y]
+	}
+	singlePass()
+}
+
+//================Game===================================================================//
 
 function setup() {
 	frameRate(fr)
@@ -32,16 +78,27 @@ function setup() {
 
 
 function draw() {
+	scale(zoom)
 	updateHud()
 	updateMap()
 	drawMap()
 }
 
-function gen() {
-	columns = floor((window.innerWidth - 50) / size)
-	rows = floor((window.innerHeight - 110) / size)
-	let mycanvas = createCanvas(size * columns, size * rows);
-	mycanvas.parent("mycanvas");
+function gen(gridSize = null) {
+	if (started === false) {
+		if (gridSize !== null) {
+			columns = floor(parseInt(gridSize))
+			rows = floor((parseInt(gridSize) / 16) * 9)
+		} else {
+			columns = floor((window.innerWidth - 50) / size)
+			rows = floor((window.innerHeight - 110) / size)
+		}
+		let mycanvas = createCanvas(size * columns, size * rows);
+		mycanvas.parent("mycanvas");
+		initMap()
+	} else {
+		notify("warning", "Stop game before changing size", 4000)
+	}
 }
 
 function updateHud() {
@@ -150,6 +207,21 @@ function buildNext(i, j) { //enfer
 
 }
 
+function singlePass() {
+	for (let i = 0; i < rows; i++) {
+		for (let j = 0; j < columns; j++) {
+			if (map[i][j] === false)
+				fill(emptyColor)
+			else
+				fill(fullColor)
+			stroke(gridColor)
+			rect(j * size, i * size, size-1, size-1);		
+		}
+	}
+}
+
+//===================Interactions==============================================================//
+
 function handleDraw() {
 	let pair = {}
 	pair.x = floor(mouseY / size)
@@ -166,20 +238,6 @@ function handleDraw() {
 	}
 }
 
-
-
-function singlePass() {
-	for (let i = 0; i < rows; i++) {
-		for (let j = 0; j < columns; j++) {
-			if (map[i][j] === false)
-				fill(emptyColor)
-			else
-				fill(fullColor)
-			stroke(gridColor)
-			rect(j * size, i * size, size-1, size-1);		
-		}
-	}
-}
 
 function eraseMap() {
 	if (started === false){
@@ -212,14 +270,6 @@ function fillMap() {
 
 }
 
-function bindClickButtons(e) {
-	const action = e.currentTarget.getAttribute("data-action")
-	console.log(action, typeof window[action] === "function")
-	if (typeof window[action] === "function") {
-		window[action](e.currentTarget)
-	}
-}
-
 function resetMap(e) {
 	iterations = 0;
 	initMap()
@@ -249,39 +299,29 @@ function saveState(e) {
 }
 
 function loadState(e) {
-	if (started === false) {
-		let tmp = getItem("lifemap")
-		map = getItem("lifemap")
-		next = getItem("lifemap")
-	}
-	singlePass()
-	notify("success", "Board loaded", 4000)
+	let tmp = getItem("lifemap")
+	notify("warning", "come back later", 4000)
 }
 
-document.querySelector(".size").addEventListener("change", e => {
+function squareSize(e) {
 	if (started === false) {
-		size = e.target.value
+		size = e.value
 		gen()
 		initMap();
 		singlePass();
+	} else {
+		notify("warning", "stop to apply", 4000)
 	}
-})
-
-document.querySelector(".framerate").addEventListener("change", e => {
-	console.log(frameRate())
-	frameRate(parseInt(e.target.value))
-	console.log(frameRate())
-
-})
-
-function mouseDragged() {
-	handleDraw()
 }
 
-function mouseReleased() {
-	singlePass()
-	buffer = []
+function changeFramerate(e) {
+	frameRate(parseInt(e.value))
 }
+
+function changeWidth(e) {
+	gen(e.value)
+}
+
 
 function swapColors() {
 	emptyColor = emptyColor === "white" ? "black" : "white";
@@ -289,15 +329,15 @@ function swapColors() {
 	singlePass()
 }
 
+function zoomin(e) {
 
-function mousePressed() {
-	let x = floor(mouseY / size)
-	let y = floor(mouseX / size)
-	if ((x >= 0 && mouseX <= columns * size) && (y >= 0 && mouseY <= rows * size)){
-		map[x][y] = !map[x][y]
-	}
-	singlePass()
 }
+
+function zoomout(e) {
+
+}
+
+
 
 function notify(type, message, duration) {
 	let options = {}
