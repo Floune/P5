@@ -1,5 +1,5 @@
 body {
-
+	background-color: black;
 }
 
 .container {
@@ -10,40 +10,14 @@ body {
 }
 
 .toolbar {
-	width: 95%;
+	width: 100%;
 	display: flex;
-	justify-content: space-between;
+	justify-content: flex-start;
 	margin-bottom: 15px;
 }
 
-
-.bouton {
-	box-shadow:inset 0px 1px 0px 0px #fbafe3;
-	background:linear-gradient(to bottom, #ff5bb0 5%, #ef027d 100%);
-	background-color:#ff5bb0;
-	border-radius:6px;
-	border:1px solid #ee1eb5;
-	display:inline-block;
-	cursor:pointer;
-	color:#ffffff;
-	font-family: Arial;
-	font-size:15px;
-	font-weight:bold;
-	padding:6px 24px;
-	text-decoration:none;
-	text-shadow:0px 1px 0px #c70067;
-}
-.bouton:hover {
-	background:linear-gradient(to bottom, #ef027d 5%, #ff5bb0 100%);
-	background-color:#ef027d;
-}
-.bouton:active {
-	position:relative;
-	top:1px;
-}
-
 .started {
-	background-color: green;
+	background-color: #0202fc;
 	height: 25px;
 	width: 25px;
 	border-radius: 50%;
@@ -59,9 +33,10 @@ body {
 }
 
 .infos {
-	width: 15%;
+	width: 100px;
 	display: flex;
-	justify-content: flex-end;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .status {
@@ -69,8 +44,78 @@ body {
 }
 
 .iterations {
-	background-color: white;
+	font-size: 20px;
+	font-weight: bold;
+	color: #0202fc;
 	border-top: 1px solid black;
 	width: 40px;
 	height: 40px;
+}
+
+.boutons {
+	display: flex;
+}
+
+.bouton {
+	width: 30px;
+	height: 30px;
+	background-size: contain;
+	background-repeat: no-repeat;
+	border: none;
+	margin-left: 10px;
+	background-color: black;
+}
+
+.bouton:hover, .size:hover {
+	cursor: pointer;
+}
+
+.bouton:active {
+	transform: scale(0.95); 
+}
+
+.size {
+	color: white;
+	border: none;;
+	width: 30px;
+	height: 30px;
+	background-size: contain;
+	margin-left: 10px;
+	background-color: black;
+}
+
+.bouton-play {
+	background-image: url("/img/play.png")
+}
+
+.bouton-stop {
+	background-image: url("/img/pause.png")
+}
+
+.bouton-erase {
+	background-image: url("/img/erase.png")
+}
+
+.bouton-reset {
+	background-image: url("/img/reset.png")
+}
+
+.bouton-fill {
+	background-image: url("/img/fill.png")
+}
+
+.bouton-save {
+	background-image: url("/img/save.png")
+}
+
+.bouton-load {
+	background-image: url("/img/load.png")
+}
+
+.bouton-zoomin {
+	background-image: url("/img/zoomin.png")
+}
+
+.bouton-zoomout {
+	background-image: url("/img/zoomout.png")
 }

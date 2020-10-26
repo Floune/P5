@@ -1,115 +1,32 @@
 let iterations = 0
 let map = new Array()
+let sf = 1
 let size = 40
 let columns;
 let rows;
 let started = true
 let next = new Array()
 let buffer = new Array();
-let gridColor = "#F11085"
-let bgColor = "#F11085"
+let gridColor = "black"
+let bgColor = "black"
 let history = []
-let framerate = 40
+let framerate = 30
+const actions = document.querySelectorAll('[data-action]')
 
-document.querySelector(".reset").addEventListener("click", (e) => {
-	iterations = 0;
-	initMap()
-	started = false
-	singlePass()
-	updateHud()
-	noLoop()
+
+actions.forEach(a => {
+	a.addEventListener("click", e => {
+		bindClickButtons(e)
+	})
 })
-
-document.querySelector(".stop").addEventListener("click", (e) => {
-	if (started === true) {
-		started = false
-		noLoop()
-	}
-})
-
-document.querySelector(".start").addEventListener("click", (e) => {
-	if (started === false) {
-		started = true
-		loop()
-	}
-})
-
-document.querySelector(".erase").addEventListener("click", (e) => {
-	if (started === false){
-		iterations = 0;
-		updateHud()
-		eraseMap()
-	}
-})
-
-document.querySelector(".fill").addEventListener("click", (e) => {
-	if (started === false) {
-		iterations = 0
-		updateHud()
-		fillMap()
-	}
-})
-
-document.querySelector(".save").addEventListener("click", (e) => {
-	storeItem("lifemap", map)
-})
-
-document.querySelector(".load").addEventListener("click", (e) => {
-	if (started === false) {
-		let tmp = getItem("lifemap")
-		map = getItem("lifemap")
-		next = getItem("lifemap")
-	}
-	singlePass()
-})
-
-document.querySelector(".gridcolor").addEventListener("change", e => {
-	gridColor = e.target.value
-	document.body.style.backgroundColor = e.target.value;
-	singlePass();
-})
-
-
-document.querySelector(".size").addEventListener("change", e => {
-	if (started === false) {
-		size = e.target.value
-		columns = floor((window.innerWidth - 50) / size)
-		rows = floor((window.innerHeight - 130) / size)
-		let mycanvas = createCanvas(size * columns, size * rows);	
-		initMap();
-	 	singlePass();
-	}
-})
-
-function mouseDragged() {
-	handleDraw()
-}
-
-function mouseReleased() {
-	singlePass()
-	buffer = []
-}
-
-
-function mousePressed() {
-	let x = floor(mouseY / size)
-	let y = floor(mouseX / size)
-	if ((x >= 0 && mouseX <= columns * size) && (y >= 0 && mouseY <= rows * size)){
-		map[x][y] = !map[x][y]
-	}
-	singlePass()
-}
-
 
 function setup() {
 	noLoop()
 	frameRate(framerate)
 	started = false
-	columns = floor((window.innerWidth - 50) / size)
-	rows = floor((window.innerHeight - 110) / size)
-	let mycanvas = createCanvas(size * columns, size * rows);	
+	let canvas = gen()	
 	initMap();
-	mycanvas.parent("mycanvas");
+	canvas.parent("mycanvas");
 }
 
 
@@ -117,6 +34,13 @@ function draw() {
 	updateHud()
 	updateMap()
 	drawMap()
+}
+
+function gen() {
+	columns = floor((window.innerWidth - 50) / size)
+	rows = floor((window.innerHeight - 110) / size)
+	let mycanvas = createCanvas(size * columns, size * rows);
+	return mycanvas;
 }
 
 function updateHud() {
@@ -133,14 +57,13 @@ function updateHud() {
 }
 
 function drawMap() {
-
 	for (let i = 0; i < rows; i++) {
 		for (let j = 0; j < columns; j++) {
 			if (map[i][j] === false)
-				fill("white")
+				fill("black")
 			else
-				fill(gridColor)	
-			stroke(gridColor)
+				fill("white")	
+			stroke("black")
 			rect(j * size, i * size, size-1, size-1);		
 		}
 	}
@@ -245,31 +168,110 @@ function singlePass() {
 	for (let i = 0; i < rows; i++) {
 		for (let j = 0; j < columns; j++) {
 			if (map[i][j] === false)
-				fill("white")
+				fill("black")
 			else
-				fill(gridColor)
-			stroke(gridColor)
+				fill("white")
+			stroke("black")
 			rect(j * size, i * size, size-1, size-1);		
 		}
 	}
 }
 
 function eraseMap() {
-	for (let i = 0; i < rows; i++) {
-		for (let j = 0; j < columns; j++) {
-			map[i][j] = false;
+	if (started === false){
+		iterations = 0;
+		updateHud()
+		for (let i = 0; i < rows; i++) {
+			for (let j = 0; j < columns; j++) {
+				map[i][j] = false;
+			}
 		}
+		singlePass()
 	}
-	singlePass()
 }
 
 function fillMap() {
-	for (let i = 0; i < rows; i++) {
-		for (let j = 0; j < columns; j++) {
-			map[i][j] = true;
+	if (started === false) {
+		iterations = 0
+		updateHud()
+		for (let i = 0; i < rows; i++) {
+			for (let j = 0; j < columns; j++) {
+				map[i][j] = true;
+			}
 		}
+		singlePass()
 	}
-	singlePass()
 
 }
 
+function bindClickButtons(e) {
+	const action = e.currentTarget.getAttribute("data-action")
+	console.log(action, typeof window[action] === "function")
+	if (typeof window[action] === "function") {
+		window[action](e.currentTarget)
+	}
+}
+
+function resetMap(e) {
+	iterations = 0;
+	initMap()
+	started = false
+	singlePass()
+	updateHud()
+	noLoop()
+}
+
+function stopGame(e) {
+	if (started === true) {
+		started = false
+		noLoop()
+	}
+}
+
+function startGame(e) {
+	if (started === false) {
+		started = true
+		loop()
+	}
+}
+
+function saveState(e) {
+	storeItem("lifemap", map)
+}
+
+function loadState(e) {
+	if (started === false) {
+		let tmp = getItem("lifemap")
+		map = getItem("lifemap")
+		next = getItem("lifemap")
+	}
+	singlePass()
+}
+
+document.querySelector(".size").addEventListener("change", e => {
+	if (started === false) {
+		size = e.target.value
+		gen()
+		initMap();
+		singlePass();
+	}
+})
+
+function mouseDragged() {
+	handleDraw()
+}
+
+function mouseReleased() {
+	singlePass()
+	buffer = []
+}
+
+
+function mousePressed() {
+	let x = floor(mouseY / size)
+	let y = floor(mouseX / size)
+	if ((x >= 0 && mouseX <= columns * size) && (y >= 0 && mouseY <= rows * size)){
+		map[x][y] = !map[x][y]
+	}
+	singlePass()
+}
