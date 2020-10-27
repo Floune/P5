@@ -1,7 +1,6 @@
 let iterations = 0
 let map = new Array()
-let sf = 1
-let size = 40
+let size = 23
 let columns;
 let rows;
 let started = true
@@ -78,18 +77,20 @@ function setup() {
 
 
 function draw() {
-	scale(zoom)
 	updateHud()
 	updateMap()
 	drawMap()
 }
 
-function gen(gridSize = null) {
+function gen(width = null, height = null) {
 	if (started === false) {
-		if (gridSize !== null) {
-			columns = floor(parseInt(gridSize))
-			rows = floor((parseInt(gridSize) / 16) * 8)
-		} else {
+		if (height !== null) {
+			rows = floor(parseInt(height))
+		}
+		 else if (width !== null) {
+			columns = floor(parseInt(width))
+		}
+		 else {
 			columns = floor((window.innerWidth - 50) / size)
 			rows = floor((window.innerHeight - 110) / size)
 		}
@@ -319,7 +320,11 @@ function changeFramerate(e) {
 }
 
 function changeWidth(e) {
-	gen(e.value)
+	gen(e.value, null)
+}
+
+function changeHeight(e) {
+	gen(null, e.value)
 }
 
 
@@ -329,13 +334,7 @@ function swapColors() {
 	singlePass()
 }
 
-function zoomin(e) {
 
-}
-
-function zoomout(e) {
-
-}
 
 function stepGame() {
 	updateMap()
@@ -343,7 +342,6 @@ function stepGame() {
 }
 
 function canon() {
-	console.log(map[0].length, map.length)
 	if (map[0].length > 36 && map.length > 14) {
 		for (let i = 0; i < rows; i ++) {
 			for (let j = 0; j < columns; j++) {
