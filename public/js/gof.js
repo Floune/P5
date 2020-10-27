@@ -18,6 +18,8 @@ var zMax = 9.00;
 var sensativity = 0.4;
 const actions = document.querySelectorAll('[data-action]')
 const changes = document.querySelectorAll('[data-change]')
+let isCool;
+let whichCool;
 
 //================Listeners==============================================================//
 
@@ -59,7 +61,13 @@ function mouseReleased() {
 function mousePressed() {
 	let x = floor(mouseY / size)
 	let y = floor(mouseX / size)
-	if ((x >= 0 && mouseX <= columns * size) && (y >= 0 && mouseY <= rows * size)){
+	if (isCool) {
+		if (typeof window[whichCool] === "function") {
+			window[whichCool](x, y)
+		}
+		isCool = false;
+	}
+	else if ((x >= 0 && mouseX <= columns * size) && (y >= 0 && mouseY <= rows * size)){
 		map[x][y] = !map[x][y]
 	}
 	singlePass()
@@ -141,7 +149,7 @@ function initMap() {
 	}
 
 }
-
+//PROUT PROUT PROUTPROUT
 function updateMap() {
 	iterations++; 
 	for (let i = 0; i < rows; i++) {
@@ -327,6 +335,25 @@ function changeHeight(e) {
 	gen(null, e.value)
 }
 
+function canon() {
+	isCool = true;
+	whichCool = "drawCanon"
+}
+
+function canon1() {
+	isCool = true;
+	whichCool = "drawCanon1"
+}
+
+function revcanon() {
+	isCool = true;
+	whichCool = "drawReverseCanon"
+}
+
+function revcanon1() {
+	isCool = true;
+	whichCool = "drawReverseCanon1"
+}
 
 function swapColors() {
 	emptyColor = emptyColor === "#2CFE02" ? "black" : "#2CFE02";
@@ -341,56 +368,7 @@ function stepGame() {
 	singlePass()
 }
 
-function canon() {
-	if (map[0].length > 36 && map.length > 14) {
-		for (let i = 0; i < rows; i ++) {
-			for (let j = 0; j < columns; j++) {
-				map[i][j] = false
-			}	
-		}
-		map[0][24] = true
-		map[1][22] = true
-		map[1][24] = true
-		map[2][20] = true
-		map[2][21] = true
-		map[2][34] = true
-		map[2][35] = true
-		map[2][13] = true
-		map[2][12] = true
-		map[3][20] = true
-		map[3][21] = true
-		map[3][34] = true
-		map[3][35] = true
-		map[3][15] = true
-		map[3][11] = true
-		map[4][0] = true
-		map[4][1] = true
-		map[4][10] = true
-		map[4][16] = true
-		map[4][20] = true
-		map[4][21] = true
-		map[5][0] = true
-		map[5][1] = true
-		map[5][10] = true
-		map[5][14] = true
-		map[5][16] = true
-		map[5][17] = true
-		map[5][22] = true
-		map[5][24] = true
-		map[6][10] = true
-		map[6][16] = true
-		map[6][24] = true
-		map[7][11] = true
-		map[7][15] = true
-		map[8][12] = true
-		map[8][13] = true
-		singlePass()
 
-	} else {
-		notify("warning", "map too small", 4000)
-	}
-	
-}
 
 function notify(type, message, duration) {
 	let options = {}
@@ -404,3 +382,170 @@ function notify(type, message, duration) {
 	type === "success" ? window.notifier.success(message, options) : window.notifier.warning(message, options)
 }
 
+function drawCanon(x, y) {
+	console.log(x, y)
+		map[x][y + 24] = true
+		map[x + 1][y + 22] = true
+		map[x + 1][y + 24] = true
+		map[x + 2][y + 20] = true
+		map[x + 2][y + 21] = true
+		map[x + 2][y + 34] = true
+		map[x + 2][y + 35] = true
+		map[x + 2][y + 13] = true
+		map[x + 2][y + 12] = true
+		map[x + 3][y + 20] = true
+		map[x + 3][y + 21] = true
+		map[x + 3][y + 34] = true
+		map[x + 3][y + 35] = true
+		map[x + 3][y + 15] = true
+		map[x + 3][y + 11] = true
+		map[x + 4][y + 0] = true
+		map[x + 4][y + 1] = true
+		map[x + 4][y + 10] = true
+		map[x + 4][y + 16] = true
+		map[x + 4][y + 20] = true
+		map[x + 4][y + 21] = true
+		map[x + 5][y + 0] = true
+		map[x + 5][y + 1] = true
+		map[x + 5][y + 10] = true
+		map[x + 5][y + 14] = true
+		map[x + 5][y + 16] = true
+		map[x + 5][y + 17] = true
+		map[x + 5][y + 22] = true
+		map[x + 5][y + 24] = true
+		map[x + 6][y + 10] = true
+		map[x + 6][y + 16] = true
+		map[x + 6][y + 24] = true
+		map[x + 7][y + 11] = true
+		map[x + 7][y + 15] = true
+		map[x + 8][y + 12] = true
+		map[x + 8][y + 13] = true
+		singlePass()
+
+	
+}
+
+function drawReverseCanon(x, y) {
+		map[x][y - 24] = true
+		map[x - 1][y - 22] = true
+		map[x - 1][y - 24] = true
+		map[x - 2][y - 20] = true
+		map[x - 2][y - 21] = true
+		map[x - 2][y - 34] = true
+		map[x - 2][y - 35] = true
+		map[x - 2][y - 13] = true
+		map[x - 2][y - 12] = true
+		map[x - 3][y - 20] = true
+		map[x - 3][y - 21] = true
+		map[x - 3][y - 34] = true
+		map[x - 3][y - 35] = true
+		map[x - 3][y - 15] = true
+		map[x - 3][y - 11] = true
+		map[x - 4][y - 0] = true
+		map[x - 4][y - 1] = true
+		map[x - 4][y - 10] = true
+		map[x - 4][y - 16] = true
+		map[x - 4][y - 20] = true
+		map[x - 4][y - 21] = true
+		map[x - 5][y - 0] = true
+		map[x - 5][y - 1] = true
+		map[x - 5][y - 10] = true
+		map[x - 5][y - 14] = true
+		map[x - 5][y - 16] = true
+		map[x - 5][y - 17] = true
+		map[x - 5][y - 22] = true
+		map[x - 5][y - 24] = true
+		map[x - 6][y - 10] = true
+		map[x - 6][y - 16] = true
+		map[x - 6][y - 24] = true
+		map[x - 7][y - 11] = true
+		map[x - 7][y - 15] = true
+		map[x - 8][y - 12] = true
+		map[x - 8][y - 13] = true
+		singlePass()
+
+	
+}
+
+function drawCanon1(x, y) {
+		map[x][y - 24] = true
+		map[x + 1][y - 22] = true
+		map[x + 1][y - 24] = true
+		map[x + 2][y - 20] = true
+		map[x + 2][y - 21] = true
+		map[x + 2][y - 34] = true
+		map[x + 2][y - 35] = true
+		map[x + 2][y - 13] = true
+		map[x + 2][y - 12] = true
+		map[x + 3][y - 20] = true
+		map[x + 3][y - 21] = true
+		map[x + 3][y - 34] = true
+		map[x + 3][y - 35] = true
+		map[x + 3][y - 15] = true
+		map[x + 3][y - 11] = true
+		map[x + 4][y - 0] = true
+		map[x + 4][y - 1] = true
+		map[x + 4][y - 10] = true
+		map[x + 4][y - 16] = true
+		map[x + 4][y - 20] = true
+		map[x + 4][y - 21] = true
+		map[x + 5][y - 0] = true
+		map[x + 5][y - 1] = true
+		map[x + 5][y - 10] = true
+		map[x + 5][y - 14] = true
+		map[x + 5][y - 16] = true
+		map[x + 5][y - 17] = true
+		map[x + 5][y - 22] = true
+		map[x + 5][y - 24] = true
+		map[x + 6][y - 10] = true
+		map[x + 6][y - 16] = true
+		map[x + 6][y - 24] = true
+		map[x + 7][y - 11] = true
+		map[x + 7][y - 15] = true
+		map[x + 8][y - 12] = true
+		map[x + 8][y - 13] = true
+		singlePass()
+	
+}
+
+function drawReverseCanon1(x, y) {
+		map[x][y + 24] = true
+		map[x - 1][y + 22] = true
+		map[x - 1][y + 24] = true
+		map[x - 2][y + 20] = true
+		map[x - 2][y + 21] = true
+		map[x - 2][y + 34] = true
+		map[x - 2][y + 35] = true
+		map[x - 2][y + 13] = true
+		map[x - 2][y + 12] = true
+		map[x - 3][y + 20] = true
+		map[x - 3][y + 21] = true
+		map[x - 3][y + 34] = true
+		map[x - 3][y + 35] = true
+		map[x - 3][y + 15] = true
+		map[x - 3][y + 11] = true
+		map[x - 4][y + 0] = true
+		map[x - 4][y + 1] = true
+		map[x - 4][y + 10] = true
+		map[x - 4][y + 16] = true
+		map[x - 4][y + 20] = true
+		map[x - 4][y + 21] = true
+		map[x - 5][y + 0] = true
+		map[x - 5][y + 1] = true
+		map[x - 5][y + 10] = true
+		map[x - 5][y + 14] = true
+		map[x - 5][y + 16] = true
+		map[x - 5][y + 17] = true
+		map[x - 5][y + 22] = true
+		map[x - 5][y + 24] = true
+		map[x - 6][y + 10] = true
+		map[x - 6][y + 16] = true
+		map[x - 6][y + 24] = true
+		map[x - 7][y + 11] = true
+		map[x - 7][y + 15] = true
+		map[x - 8][y + 12] = true
+		map[x - 8][y + 13] = true
+		singlePass()
+
+	
+}

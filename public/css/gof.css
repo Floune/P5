@@ -131,9 +131,24 @@ body {
 }
 
 .bouton-canon {
-	background-image: url("/img/gun.png")
+	background-image: url("/img/gun.png");
+    transform: scaleY(-1);
 }
 
+.bouton-rev-canon {
+	background-image: url("/img/gun.png");
+    transform: scaleX(-1);
+	
+}
+
+.bouton-canon1 {
+	background-image: url("/img/gunc.png");
+}
+
+.bouton-rev-canon1 {
+	background-image: url("/img/gun.png");
+	
+}
 
 .slider {
 	margin-left: 10px;
