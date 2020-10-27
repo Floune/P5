@@ -54,6 +54,7 @@ body {
 
 .boutons {
 	display: flex;
+	flex-wrap: wrap;
 }
 
 .bouton {
