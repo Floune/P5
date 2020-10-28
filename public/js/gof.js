@@ -95,10 +95,10 @@ function gen(width = null, height = null) {
 		if (height !== null) {
 			rows = floor(parseInt(height))
 		}
-		 else if (width !== null) {
+		else if (width !== null) {
 			columns = floor(parseInt(width))
 		}
-		 else {
+		else {
 			columns = floor((window.innerWidth - 50) / size)
 			rows = floor((window.innerHeight - 110) / size)
 		}
@@ -126,10 +126,12 @@ function updateHud() {
 function drawMap() {
 	for (let i = 0; i < rows; i++) {
 		for (let j = 0; j < columns; j++) {
-			if (map[i][j] === false)
+			if (map[i][j] === false) {
 				fill(emptyColor)
-			else
+			} else {
 				fill(fullColor)	
+
+			}
 			stroke(gridColor)
 			rect(j * size, i * size, size-1, size-1);		
 		}
@@ -219,12 +221,14 @@ function buildNext(i, j) { //enfer
 function singlePass() {
 	for (let i = 0; i < rows; i++) {
 		for (let j = 0; j < columns; j++) {
-			if (map[i][j] === false)
+			if (map[i][j] === false) {
 				fill(emptyColor)
-			else
-				fill(fullColor)
+			} else {
+				fill(fullColor)	
+			}
 			stroke(gridColor)
 			rect(j * size, i * size, size-1, size-1);		
+
 		}
 	}
 }
@@ -355,6 +359,29 @@ function revcanon1() {
 	whichCool = "drawReverseCanon1"
 }
 
+function ship() {
+	isCool = true;
+	whichCool = "drawShip"
+}
+
+function ship1() {
+	isCool = true;
+	whichCool = "drawShip1"
+}
+
+
+function revship() {
+	isCool= true;
+	whichCool = "drawRevShip"
+}
+
+
+function revship1() {
+	isCool= true;
+	whichCool = "drawRevShip1"
+}
+
+
 function swapColors() {
 	emptyColor = emptyColor === "#2CFE02" ? "black" : "#2CFE02";
 	fullColor = fullColor === "#2CFE02" ? "black" : "#2CFE02";
@@ -383,7 +410,7 @@ function notify(type, message, duration) {
 }
 
 function drawCanon(x, y) {
-	console.log(x, y)
+	if(map[x + 8] !== undefined && map[x + 8][y + 35] !== undefined) {
 		map[x][y + 24] = true
 		map[x + 1][y + 22] = true
 		map[x + 1][y + 24] = true
@@ -421,11 +448,15 @@ function drawCanon(x, y) {
 		map[x + 8][y + 12] = true
 		map[x + 8][y + 13] = true
 		singlePass()
-
+	} else {
+		notify("warning", "pas assez de place", 4000)
+	}
 	
 }
 
 function drawReverseCanon(x, y) {
+	if(map[x - 8] !== undefined && map[x - 8][y - 35] !== undefined) {
+
 		map[x][y - 24] = true
 		map[x - 1][y - 22] = true
 		map[x - 1][y - 24] = true
@@ -463,11 +494,14 @@ function drawReverseCanon(x, y) {
 		map[x - 8][y - 12] = true
 		map[x - 8][y - 13] = true
 		singlePass()
-
+	} else {
+		notify("warning", "pas assez de place", 4000)
+	}
 	
 }
 
 function drawCanon1(x, y) {
+	if(map[x + 8] !== undefined && map[x + 8][y - 35] !== undefined) {
 		map[x][y - 24] = true
 		map[x + 1][y - 22] = true
 		map[x + 1][y - 24] = true
@@ -505,10 +539,14 @@ function drawCanon1(x, y) {
 		map[x + 8][y - 12] = true
 		map[x + 8][y - 13] = true
 		singlePass()
-	
+	} else {
+		notify("warning", "pas assez de place", 4000)
+	}
 }
 
 function drawReverseCanon1(x, y) {
+	if(map[x - 8] !== undefined && map[x - 8][y + 35] !== undefined) {
+
 		map[x][y + 24] = true
 		map[x - 1][y + 22] = true
 		map[x - 1][y + 24] = true
@@ -546,6 +584,43 @@ function drawReverseCanon1(x, y) {
 		map[x - 8][y + 12] = true
 		map[x - 8][y + 13] = true
 		singlePass()
+	} else {
+		notify("warning", "pas assez de place", 4000)
+	}
+}
 
-	
+function drawShip(x, y) {
+	map[x][y + 1] = true
+	map[x + 1][y + 2] = true
+	map[x + 2][y] = true
+	map[x + 2][y + 1] = true
+	map[x + 2][y + 2] = true
+	singlePass()
+}
+
+function drawShip1(x, y) {
+	map[x][y + 1] = true
+	map[x - 1][y + 2] = true
+	map[x - 2][y] = true
+	map[x - 2][y + 1] = true
+	map[x - 2][y + 2] = true
+	singlePass()
+}
+
+function drawRevShip(x, y) {
+	map[x][y - 1] = true
+	map[x + 1][y - 2] = true
+	map[x + 2][y] = true
+	map[x + 2][y - 1] = true
+	map[x + 2][y - 2] = true
+	singlePass()
+}
+
+function drawRevShip1(x, y) {
+	map[x][y - 1] = true
+	map[x - 1][y - 2] = true
+	map[x - 2][y] = true
+	map[x - 2][y - 1] = true
+	map[x - 2][y - 2] = true
+	singlePass()
 }

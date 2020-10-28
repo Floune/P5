@@ -150,6 +150,25 @@ body {
 	
 }
 
+.bouton-ship {
+	background-image: url("/img/ship.png");
+}
+
+.bouton-ship1 {
+	background-image: url("/img/ship1.png");
+}
+
+.bouton-ship-rev {
+	background-image: url("/img/ship.png");
+    transform: scaleX(-1);
+}
+
+.bouton-ship1-rev {
+	background-image: url("/img/ship1.png");
+    transform: scaleX(-1);
+}
+
+
 .slider {
 	margin-left: 10px;
 	-webkit-appearance: none;  
