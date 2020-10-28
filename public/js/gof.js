@@ -1,10 +1,10 @@
 let iterations = 0
-let map = new Array()
+let map = new Set()
 let size = 23
 let columns;
 let rows;
 let started = true
-let next = new Array()
+let next = new Set()
 let buffer = new Array();
 let gridColor = "black"
 let emptyColor = "black"
@@ -126,7 +126,7 @@ function updateHud() {
 function drawMap() {
 	for (let i = 0; i < rows; i++) {
 		for (let j = 0; j < columns; j++) {
-			if (map[i][j] === false) {
+			if (map[i][j] === 0) {
 				fill(emptyColor)
 			} else {
 				fill(fullColor)	
@@ -140,13 +140,13 @@ function drawMap() {
 
 function initMap() {
 	for (let i = 0; i < rows; i ++) {
-		map[i] = new Array(columns)
-		next[i] = new Array(columns)
+		map[i] = new Uint8Array(columns)
+		next[i] = new Uint8Array(columns)
 	}
 	for (let i = 0; i < rows; i++) {
 		for (let j = 0; j < columns; j++) {
-			map[i][j] = floor(random(0, 2)) === 0 ? true : false
-			next[i][j] = false;
+			map[i][j] = floor(random(0, 2)) === 0 ? 1 : 0
+			next[i][j] = 0;
 		}
 	}
 
@@ -168,49 +168,49 @@ function buildNext(i, j) { //enfer
 	let neighbours = 0;
 
 	if (i !== 0 && j !== 0) {
-		if (map[i-1][j-1] === true)
+		if (map[i-1][j-1] === 1)
 			neighbours++;
 	}
 	
 	if (i !== 0) {
-		if (map[i-1][j] === true)
+		if (map[i-1][j] === 1)
 			neighbours++;
 	}
 
 	if (i !== 0 && j !== columns - 1) {
-		if (map[i-1][j+1] === true)
+		if (map[i-1][j+1] === 1)
 			neighbours++;
 	}
 
 	if (j !== 0) {
-		if (map[i][j-1] === true)
+		if (map[i][j-1] === 1)
 			neighbours++;
 	}
 
 	if (j !== columns - 1) {
-		if (map[i][j+1] === true)
+		if (map[i][j+1] === 1)
 			neighbours++;
 	}
 
 	if (i !== rows - 1 && j !== 0) {
-		if (map[i+1][j-1] === true)
+		if (map[i+1][j-1] === 1)
 			neighbours++;
 	}
 	if (i !== rows -1) {
-		if (map[i+1][j] === true)
+		if (map[i+1][j] === 1)
 			neighbours++;
 	}
 
 	if (i !== rows - 1 && j !== columns - 1) {
-		if (map[i+1][j+1] === true)
+		if (map[i+1][j+1] === 1)
 			neighbours++;
 	}
 
-	if (((map[i][j] == true) && (neighbours <  2)) || ((map[i][j] == true) && (neighbours >  3))){
-		return false;
+	if (((map[i][j] == 1) && (neighbours <  2)) || ((map[i][j] == 1) && (neighbours >  3))){
+		return 0;
 	}
 	else if ((map[i][j] == false) && (neighbours == 3)){
-		return true;
+		return 1;
 	}
 	
 	return map[i][j]; 
@@ -221,7 +221,7 @@ function buildNext(i, j) { //enfer
 function singlePass() {
 	for (let i = 0; i < rows; i++) {
 		for (let j = 0; j < columns; j++) {
-			if (map[i][j] === false) {
+			if (map[i][j] === 0) {
 				fill(emptyColor)
 			} else {
 				fill(fullColor)	
@@ -258,7 +258,7 @@ function eraseMap() {
 		updateHud()
 		for (let i = 0; i < rows; i++) {
 			for (let j = 0; j < columns; j++) {
-				map[i][j] = false;
+				map[i][j] = 0;
 			}
 		}
 		singlePass()
@@ -273,7 +273,7 @@ function fillMap() {
 		updateHud()
 		for (let i = 0; i < rows; i++) {
 			for (let j = 0; j < columns; j++) {
-				map[i][j] = true;
+				map[i][j] = 1;
 			}
 		}
 		singlePass()
@@ -412,41 +412,41 @@ function notify(type, message, duration) {
 function drawCanon(x, y) {
 	if(map[x + 8] !== undefined && map[x + 8][y + 35] !== undefined) {
 		map[x][y + 24] = true
-		map[x + 1][y + 22] = true
-		map[x + 1][y + 24] = true
-		map[x + 2][y + 20] = true
-		map[x + 2][y + 21] = true
-		map[x + 2][y + 34] = true
-		map[x + 2][y + 35] = true
-		map[x + 2][y + 13] = true
-		map[x + 2][y + 12] = true
-		map[x + 3][y + 20] = true
-		map[x + 3][y + 21] = true
-		map[x + 3][y + 34] = true
-		map[x + 3][y + 35] = true
-		map[x + 3][y + 15] = true
-		map[x + 3][y + 11] = true
-		map[x + 4][y + 0] = true
-		map[x + 4][y + 1] = true
-		map[x + 4][y + 10] = true
-		map[x + 4][y + 16] = true
-		map[x + 4][y + 20] = true
-		map[x + 4][y + 21] = true
-		map[x + 5][y + 0] = true
-		map[x + 5][y + 1] = true
-		map[x + 5][y + 10] = true
-		map[x + 5][y + 14] = true
-		map[x + 5][y + 16] = true
-		map[x + 5][y + 17] = true
-		map[x + 5][y + 22] = true
-		map[x + 5][y + 24] = true
-		map[x + 6][y + 10] = true
-		map[x + 6][y + 16] = true
-		map[x + 6][y + 24] = true
-		map[x + 7][y + 11] = true
-		map[x + 7][y + 15] = true
-		map[x + 8][y + 12] = true
-		map[x + 8][y + 13] = true
+		map[x + 1][y + 22] = 1
+		map[x + 1][y + 24] = 1
+		map[x + 2][y + 20] = 1
+		map[x + 2][y + 21] = 1
+		map[x + 2][y + 34] = 1
+		map[x + 2][y + 35] = 1
+		map[x + 2][y + 13] = 1
+		map[x + 2][y + 12] = 1
+		map[x + 3][y + 20] = 1
+		map[x + 3][y + 21] = 1
+		map[x + 3][y + 34] = 1
+		map[x + 3][y + 35] = 1
+		map[x + 3][y + 15] = 1
+		map[x + 3][y + 11] = 1
+		map[x + 4][y + 0] = 1
+		map[x + 4][y + 1] = 1
+		map[x + 4][y + 10] = 1
+		map[x + 4][y + 16] = 1
+		map[x + 4][y + 20] = 1
+		map[x + 4][y + 21] = 1
+		map[x + 5][y + 0] = 1
+		map[x + 5][y + 1] = 1
+		map[x + 5][y + 10] = 1
+		map[x + 5][y + 14] = 1
+		map[x + 5][y + 16] = 1
+		map[x + 5][y + 17] = 1
+		map[x + 5][y + 22] = 1
+		map[x + 5][y + 24] = 1
+		map[x + 6][y + 10] = 1
+		map[x + 6][y + 16] = 1
+		map[x + 6][y + 24] = 1
+		map[x + 7][y + 11] = 1
+		map[x + 7][y + 15] = 1
+		map[x + 8][y + 12] = 1
+		map[x + 8][y + 13] = 1
 		singlePass()
 	} else {
 		notify("warning", "pas assez de place", 4000)
@@ -457,42 +457,42 @@ function drawCanon(x, y) {
 function drawReverseCanon(x, y) {
 	if(map[x - 8] !== undefined && map[x - 8][y - 35] !== undefined) {
 
-		map[x][y - 24] = true
-		map[x - 1][y - 22] = true
-		map[x - 1][y - 24] = true
-		map[x - 2][y - 20] = true
-		map[x - 2][y - 21] = true
-		map[x - 2][y - 34] = true
-		map[x - 2][y - 35] = true
-		map[x - 2][y - 13] = true
-		map[x - 2][y - 12] = true
-		map[x - 3][y - 20] = true
-		map[x - 3][y - 21] = true
-		map[x - 3][y - 34] = true
-		map[x - 3][y - 35] = true
-		map[x - 3][y - 15] = true
-		map[x - 3][y - 11] = true
-		map[x - 4][y - 0] = true
-		map[x - 4][y - 1] = true
-		map[x - 4][y - 10] = true
-		map[x - 4][y - 16] = true
-		map[x - 4][y - 20] = true
-		map[x - 4][y - 21] = true
-		map[x - 5][y - 0] = true
-		map[x - 5][y - 1] = true
-		map[x - 5][y - 10] = true
-		map[x - 5][y - 14] = true
-		map[x - 5][y - 16] = true
-		map[x - 5][y - 17] = true
-		map[x - 5][y - 22] = true
-		map[x - 5][y - 24] = true
-		map[x - 6][y - 10] = true
-		map[x - 6][y - 16] = true
-		map[x - 6][y - 24] = true
-		map[x - 7][y - 11] = true
-		map[x - 7][y - 15] = true
-		map[x - 8][y - 12] = true
-		map[x - 8][y - 13] = true
+		map[x][y - 24] = 1
+		map[x - 1][y - 22] = 1
+		map[x - 1][y - 24] = 1
+		map[x - 2][y - 20] = 1
+		map[x - 2][y - 21] = 1
+		map[x - 2][y - 34] = 1
+		map[x - 2][y - 35] = 1
+		map[x - 2][y - 13] = 1
+		map[x - 2][y - 12] = 1
+		map[x - 3][y - 20] = 1
+		map[x - 3][y - 21] = 1
+		map[x - 3][y - 34] = 1
+		map[x - 3][y - 35] = 1
+		map[x - 3][y - 15] = 1
+		map[x - 3][y - 11] = 1
+		map[x - 4][y - 0] = 1
+		map[x - 4][y - 1] = 1
+		map[x - 4][y - 10] = 1
+		map[x - 4][y - 16] = 1
+		map[x - 4][y - 20] = 1
+		map[x - 4][y - 21] = 1
+		map[x - 5][y - 0] = 1
+		map[x - 5][y - 1] = 1
+		map[x - 5][y - 10] = 1
+		map[x - 5][y - 14] = 1
+		map[x - 5][y - 16] = 1
+		map[x - 5][y - 17] = 1
+		map[x - 5][y - 22] = 1
+		map[x - 5][y - 24] = 1
+		map[x - 6][y - 10] = 1
+		map[x - 6][y - 16] = 1
+		map[x - 6][y - 24] = 1
+		map[x - 7][y - 11] = 1
+		map[x - 7][y - 15] = 1
+		map[x - 8][y - 12] = 1
+		map[x - 8][y - 13] = 1
 		singlePass()
 	} else {
 		notify("warning", "pas assez de place", 4000)
@@ -502,42 +502,42 @@ function drawReverseCanon(x, y) {
 
 function drawCanon1(x, y) {
 	if(map[x + 8] !== undefined && map[x + 8][y - 35] !== undefined) {
-		map[x][y - 24] = true
-		map[x + 1][y - 22] = true
-		map[x + 1][y - 24] = true
-		map[x + 2][y - 20] = true
-		map[x + 2][y - 21] = true
-		map[x + 2][y - 34] = true
-		map[x + 2][y - 35] = true
-		map[x + 2][y - 13] = true
-		map[x + 2][y - 12] = true
-		map[x + 3][y - 20] = true
-		map[x + 3][y - 21] = true
-		map[x + 3][y - 34] = true
-		map[x + 3][y - 35] = true
-		map[x + 3][y - 15] = true
-		map[x + 3][y - 11] = true
-		map[x + 4][y - 0] = true
-		map[x + 4][y - 1] = true
-		map[x + 4][y - 10] = true
-		map[x + 4][y - 16] = true
-		map[x + 4][y - 20] = true
-		map[x + 4][y - 21] = true
-		map[x + 5][y - 0] = true
-		map[x + 5][y - 1] = true
-		map[x + 5][y - 10] = true
-		map[x + 5][y - 14] = true
-		map[x + 5][y - 16] = true
-		map[x + 5][y - 17] = true
-		map[x + 5][y - 22] = true
-		map[x + 5][y - 24] = true
-		map[x + 6][y - 10] = true
-		map[x + 6][y - 16] = true
-		map[x + 6][y - 24] = true
-		map[x + 7][y - 11] = true
-		map[x + 7][y - 15] = true
-		map[x + 8][y - 12] = true
-		map[x + 8][y - 13] = true
+		map[x][y - 24] = 1
+		map[x + 1][y - 22] = 1
+		map[x + 1][y - 24] = 1
+		map[x + 2][y - 20] = 1
+		map[x + 2][y - 21] = 1
+		map[x + 2][y - 34] = 1
+		map[x + 2][y - 35] = 1
+		map[x + 2][y - 13] = 1
+		map[x + 2][y - 12] = 1
+		map[x + 3][y - 20] = 1
+		map[x + 3][y - 21] = 1
+		map[x + 3][y - 34] = 1
+		map[x + 3][y - 35] = 1
+		map[x + 3][y - 15] = 1
+		map[x + 3][y - 11] = 1
+		map[x + 4][y - 0] = 1
+		map[x + 4][y - 1] = 1
+		map[x + 4][y - 10] = 1
+		map[x + 4][y - 16] = 1
+		map[x + 4][y - 20] = 1
+		map[x + 4][y - 21] = 1
+		map[x + 5][y - 0] = 1
+		map[x + 5][y - 1] = 1
+		map[x + 5][y - 10] = 1
+		map[x + 5][y - 14] = 1
+		map[x + 5][y - 16] = 1
+		map[x + 5][y - 17] = 1
+		map[x + 5][y - 22] = 1
+		map[x + 5][y - 24] = 1
+		map[x + 6][y - 10] = 1
+		map[x + 6][y - 16] = 1
+		map[x + 6][y - 24] = 1
+		map[x + 7][y - 11] = 1
+		map[x + 7][y - 15] = 1
+		map[x + 8][y - 12] = 1
+		map[x + 8][y - 13] = 1
 		singlePass()
 	} else {
 		notify("warning", "pas assez de place", 4000)
@@ -547,42 +547,42 @@ function drawCanon1(x, y) {
 function drawReverseCanon1(x, y) {
 	if(map[x - 8] !== undefined && map[x - 8][y + 35] !== undefined) {
 
-		map[x][y + 24] = true
-		map[x - 1][y + 22] = true
-		map[x - 1][y + 24] = true
-		map[x - 2][y + 20] = true
-		map[x - 2][y + 21] = true
-		map[x - 2][y + 34] = true
-		map[x - 2][y + 35] = true
-		map[x - 2][y + 13] = true
-		map[x - 2][y + 12] = true
-		map[x - 3][y + 20] = true
-		map[x - 3][y + 21] = true
-		map[x - 3][y + 34] = true
-		map[x - 3][y + 35] = true
-		map[x - 3][y + 15] = true
-		map[x - 3][y + 11] = true
-		map[x - 4][y + 0] = true
-		map[x - 4][y + 1] = true
-		map[x - 4][y + 10] = true
-		map[x - 4][y + 16] = true
-		map[x - 4][y + 20] = true
-		map[x - 4][y + 21] = true
-		map[x - 5][y + 0] = true
-		map[x - 5][y + 1] = true
-		map[x - 5][y + 10] = true
-		map[x - 5][y + 14] = true
-		map[x - 5][y + 16] = true
-		map[x - 5][y + 17] = true
-		map[x - 5][y + 22] = true
-		map[x - 5][y + 24] = true
-		map[x - 6][y + 10] = true
-		map[x - 6][y + 16] = true
-		map[x - 6][y + 24] = true
-		map[x - 7][y + 11] = true
-		map[x - 7][y + 15] = true
-		map[x - 8][y + 12] = true
-		map[x - 8][y + 13] = true
+		map[x][y + 24] = 1
+		map[x - 1][y + 22] = 1
+		map[x - 1][y + 24] = 1
+		map[x - 2][y + 20] = 1
+		map[x - 2][y + 21] = 1
+		map[x - 2][y + 34] = 1
+		map[x - 2][y + 35] = 1
+		map[x - 2][y + 13] = 1
+		map[x - 2][y + 12] = 1
+		map[x - 3][y + 20] = 1
+		map[x - 3][y + 21] = 1
+		map[x - 3][y + 34] = 1
+		map[x - 3][y + 35] = 1
+		map[x - 3][y + 15] = 1
+		map[x - 3][y + 11] = 1
+		map[x - 4][y + 0] = 1
+		map[x - 4][y + 1] = 1
+		map[x - 4][y + 10] = 1
+		map[x - 4][y + 16] = 1
+		map[x - 4][y + 20] = 1
+		map[x - 4][y + 21] = 1
+		map[x - 5][y + 0] = 1
+		map[x - 5][y + 1] = 1
+		map[x - 5][y + 10] = 1
+		map[x - 5][y + 14] = 1
+		map[x - 5][y + 16] = 1
+		map[x - 5][y + 17] = 1
+		map[x - 5][y + 22] = 1
+		map[x - 5][y + 24] = 1
+		map[x - 6][y + 10] = 1
+		map[x - 6][y + 16] = 1
+		map[x - 6][y + 24] = 1
+		map[x - 7][y + 11] = 1
+		map[x - 7][y + 15] = 1
+		map[x - 8][y + 12] = 1
+		map[x - 8][y + 13] = 1
 		singlePass()
 	} else {
 		notify("warning", "pas assez de place", 4000)
@@ -590,37 +590,37 @@ function drawReverseCanon1(x, y) {
 }
 
 function drawShip(x, y) {
-	map[x][y + 1] = true
-	map[x + 1][y + 2] = true
-	map[x + 2][y] = true
-	map[x + 2][y + 1] = true
-	map[x + 2][y + 2] = true
+	map[x][y + 1] = 1
+	map[x + 1][y + 2] = 1
+	map[x + 2][y] = 1
+	map[x + 2][y + 1] = 1
+	map[x + 2][y + 2] = 1
 	singlePass()
 }
 
 function drawShip1(x, y) {
-	map[x][y + 1] = true
-	map[x - 1][y + 2] = true
-	map[x - 2][y] = true
-	map[x - 2][y + 1] = true
-	map[x - 2][y + 2] = true
+	map[x][y + 1] = 1
+	map[x - 1][y + 2] = 1
+	map[x - 2][y] = 1
+	map[x - 2][y + 1] = 1
+	map[x - 2][y + 2] = 1
 	singlePass()
 }
 
 function drawRevShip(x, y) {
-	map[x][y - 1] = true
-	map[x + 1][y - 2] = true
-	map[x + 2][y] = true
-	map[x + 2][y - 1] = true
-	map[x + 2][y - 2] = true
+	map[x][y - 1] = 1
+	map[x + 1][y - 2] = 1
+	map[x + 2][y] = 1
+	map[x + 2][y - 1] = 1
+	map[x + 2][y - 2] = 1
 	singlePass()
 }
 
 function drawRevShip1(x, y) {
-	map[x][y - 1] = true
-	map[x - 1][y - 2] = true
-	map[x - 2][y] = true
-	map[x - 2][y - 1] = true
-	map[x - 2][y - 2] = true
+	map[x][y - 1] = 1
+	map[x - 1][y - 2] = 1
+	map[x - 2][y] = 1
+	map[x - 2][y - 1] = 1
+	map[x - 2][y - 2] = 1
 	singlePass()
 }
