@@ -1,25 +1,26 @@
-let iterations = 0
-let map = new Set()
-let size = 23
+let map = new Array();
+let next;
+let size = 10
 let columns;
 let rows;
-let started = true
-let next = new Set()
-let buffer = new Array();
+let started = false;
 let gridColor = "black"
-let emptyColor = "black"
-let fullColor = "#2CFE02"
-let history = []
-let fr = 30
-let grid = true
-var zoom = 1.00;
-var zMin = 0.05;
-var zMax = 9.00;
-var sensativity = 0.4;
+let emptyColor = "#2CFE02"
+let fullColor = "black"
 const actions = document.querySelectorAll('[data-action]')
 const changes = document.querySelectorAll('[data-change]')
+let fr = 40
+
+let buffer = new Array()
+let justBeenSet = ["prout", "fesse"];
 let isCool;
 let whichCool;
+
+
+let status = document.querySelector(".status")
+let iterationDiv = document.querySelector(".iterations")
+let iterations = 0
+
 
 //================Listeners==============================================================//
 
@@ -54,11 +55,11 @@ function mouseDragged() {
 }
 
 function mouseReleased() {
-	singlePass()
 	buffer = []
 }
 
 function mousePressed() {
+	next = new Set()
 	let x = floor(mouseY / size)
 	let y = floor(mouseX / size)
 	if (isCool) {
@@ -68,50 +69,15 @@ function mousePressed() {
 		isCool = false;
 	}
 	else if ((x >= 0 && mouseX <= columns * size) && (y >= 0 && mouseY <= rows * size)){
-		map[x][y] = !map[x][y]
+		next.add([x, y])
+		updateMap()
+		drawMap()
 	}
-	singlePass()
 }
 
 //================Game===================================================================//
 
-function setup() {
-	frameRate(fr)
-	noLoop()
-	started = false
-	let canvas = gen()	
-	initMap();
-}
-
-
-function draw() {
-	updateHud()
-	updateMap()
-	drawMap()
-}
-
-function gen(width = null, height = null) {
-	if (started === false) {
-		if (height !== null) {
-			rows = floor(parseInt(height))
-		}
-		else if (width !== null) {
-			columns = floor(parseInt(width))
-		}
-		else {
-			columns = floor((window.innerWidth - 50) / size)
-			rows = floor((window.innerHeight - 110) / size)
-		}
-		let mycanvas = createCanvas(size * columns, size * rows);
-		mycanvas.parent("mycanvas");
-		initMap()
-	} else {
-		notify("warning", "Stop game before changing size", 4000)
-	}
-}
-
 function updateHud() {
-	let status = document.querySelector(".status")
 	if (started === true) {
 		status.classList.remove("stopped")
 		status.classList.add("started")
@@ -120,10 +86,59 @@ function updateHud() {
 		status.classList.remove("started")
 		status.classList.add("stopped")
 	} 
-	document.querySelector(".iterations").innerHTML = iterations
+	iterationDiv.innerHTML = iterations
+}
+
+function gen() {
+	columns = floor((window.innerWidth - 50) / size)
+	rows = floor((window.innerHeight - 110) / size)
+	let mycanvas = createCanvas(size * columns, size * rows);
+	mycanvas.parent("mycanvas");
+	initMap()
+	drawOnceHorriblePerf()
+}
+
+function initMap() {
+	for (let i = 0; i < rows; i ++) {
+		map[i] = new Array(columns)
+	}
+	for (let i = 0; i < rows; i++) {
+		for (let j = 0; j < columns; j++) {
+			map[i][j] = floor(random(0, 2)) === 0 ? 1 : 0
+		}
+	}
+}
+
+function setup() {
+	noLoop()
+	frameRate(fr)
+	gen()
+}
+
+
+function draw() {
+	updateNext()
+	updateMap()
+	drawMap()
+	updateHud()
 }
 
 function drawMap() {
+	next.forEach(n => {
+		if (map[n[0]][n[1]] === 0) {
+			fill(emptyColor)
+		} else {
+			fill(fullColor)	
+
+		}
+		stroke(gridColor)
+		rect(n[1] * size, n[0] * size, size-1, size-1);		
+	})	
+}
+
+
+
+function drawOnceHorriblePerf() {
 	for (let i = 0; i < rows; i++) {
 		for (let j = 0; j < columns; j++) {
 			if (map[i][j] === 0) {
@@ -136,36 +151,40 @@ function drawMap() {
 			rect(j * size, i * size, size-1, size-1);		
 		}
 	}
-} 
-
-function initMap() {
-	for (let i = 0; i < rows; i ++) {
-		map[i] = new Uint8Array(columns)
-		next[i] = new Uint8Array(columns)
-	}
-	for (let i = 0; i < rows; i++) {
-		for (let j = 0; j < columns; j++) {
-			map[i][j] = floor(random(0, 2)) === 0 ? 1 : 0
-			next[i][j] = 0;
-		}
-	}
-
 }
-//PROUT PROUT PROUTPROUT
+
+
 function updateMap() {
 	iterations++; 
-	for (let i = 0; i < rows; i++) {
+	next.forEach(n => {
+		let x = n[0]
+		let y = n[1]
+		if (map[x][y] === 1){
+			map[x][y] = 0;
+
+		}
+		else if (map[x][y] === 0){
+			map[x][y] = 1;
+		}
+	})
+} 
+
+
+//PROUT PROUT PROUTPROUT
+function updateNext() {
+	next = new Set();
+	for (let i = 0; i< rows; i++) {
 		for (let j = 0; j < columns; j++) {
-			next[i][j] = buildNext(i, j)
+			if (checkChange(i, j) === true) {
+				next.add([i, j])
+			} 
 		}
 	}
-	let tmp = map
-	map = next
-	next = tmp
 }
 
-function buildNext(i, j) { //enfer
+function checkChange(i, j) { //enfer
 	let neighbours = 0;
+	let newState;
 
 	if (i !== 0 && j !== 0) {
 		if (map[i-1][j-1] === 1)
@@ -207,76 +226,72 @@ function buildNext(i, j) { //enfer
 	}
 
 	if (((map[i][j] == 1) && (neighbours <  2)) || ((map[i][j] == 1) && (neighbours >  3))){
-		return 0;
+		newState = 0;
 	}
 	else if ((map[i][j] == false) && (neighbours == 3)){
-		return 1;
+		newState = 1;
+	} else {
+		newState = map[i][j]
 	}
-	
-	return map[i][j]; 
+	return map[i][j] !== newState; 
 	
 
 }
 
-function singlePass() {
-	for (let i = 0; i < rows; i++) {
-		for (let j = 0; j < columns; j++) {
-			if (map[i][j] === 0) {
-				fill(emptyColor)
-			} else {
-				fill(fullColor)	
-			}
-			stroke(gridColor)
-			rect(j * size, i * size, size-1, size-1);		
-
-		}
-	}
-}
-
-//===================Interactions==============================================================//
 
 function handleDraw() {
-	let pair = {}
-	pair.x = floor(mouseY / size)
-	pair.y = floor(mouseX / size)
-	if ((pair.x >= 0 && mouseX <= columns * size) && (pair.y >= 0 && mouseY <= rows * size)){
+	next  = new Set()
+	let pair = []
+	pair[0] = floor(mouseY / size)
+	pair[1] = floor(mouseX / size)
 
-		buffer.length === 0 ? buffer.push(pair) : ""
+	if ((pair[0] >= 0 && mouseX <= columns * size) && (pair[1] >= 0 && mouseY <= rows * size)){
+	
 
-		if (buffer[buffer.length - 1].x != pair.x || buffer[buffer.length - 1].y != pair.y) {
-			buffer.push(pair)
-			map[pair.x][pair.y] = !map[pair.x][pair.y]
-			singlePass()
+		if (justBeenSet[0] != pair[0] || justBeenSet[1] !== pair[1]) {
+			next.add(pair)
+			updateMap()
+			drawMap()
+			justBeenSet[0] = pair[0]
+			justBeenSet[1] = pair[1]
 		} 
 	}
 }
 
 
 function eraseMap() {
+	iterations = 0;
+	next = new Set();
 	if (started === false){
-		iterations = 0;
-		updateHud()
 		for (let i = 0; i < rows; i++) {
 			for (let j = 0; j < columns; j++) {
-				map[i][j] = 0;
+				if(map[i][j] === 1) {
+					next.add([i, j])
+				}
 			}
 		}
-		singlePass()
+		updateMap();
+		drawMap();
 	} else {
 		notify("warning", "Game still running", 4000)
 	}
 }
 
 function fillMap() {
+	iterations = 0;
+	next = new Set();
+
 	if (started === false) {
 		iterations = 0
-		updateHud()
 		for (let i = 0; i < rows; i++) {
 			for (let j = 0; j < columns; j++) {
-				map[i][j] = 1;
+				if(map[i][j] === 0) {
+					next.add([i, j])
+				}
 			}
 		}
-		singlePass()
+		updateMap();
+		drawMap();
 	} else {
 		notify("warning", "Game still running", 4000)
 	}
@@ -285,11 +300,9 @@ function fillMap() {
 
 function resetMap(e) {
 	iterations = 0;
-	initMap()
-	started = false
-	singlePass()
-	updateHud()
 	noLoop()
+	started = false
+	gen()
 }
 
 function stopGame(e) {
@@ -318,10 +331,10 @@ function loadState(e) {
 
 function squareSize(e) {
 	if (started === false) {
+		iterations = 0;
 		size = e.value
 		gen()
 		initMap();
-		singlePass();
 	} else {
 		notify("warning", "stop to apply", 4000)
 	}
@@ -329,14 +342,6 @@ function squareSize(e) {
 
 function changeFramerate(e) {
 	frameRate(parseInt(e.value))
-}
-
-function changeWidth(e) {
-	gen(e.value, null)
-}
-
-function changeHeight(e) {
-	gen(null, e.value)
 }
 
 function canon() {
@@ -383,16 +388,17 @@ function revship1() {
 
 
 function swapColors() {
-	emptyColor = emptyColor === "#2CFE02" ? "black" : "#2CFE02";
-	fullColor = fullColor === "#2CFE02" ? "black" : "#2CFE02";
-	singlePass()
+		emptyColor = emptyColor === "#2CFE02" ? "black" : "#2CFE02";
+		fullColor = fullColor === "#2CFE02" ? "black" : "#2CFE02";
+		drawOnceHorriblePerf()
 }
 
 
 
 function stepGame() {
+	updateNext()
 	updateMap()
-	singlePass()
+	drawMap()
 }
 
 
@@ -410,44 +416,46 @@ function notify(type, message, duration) {
 }
 
 function drawCanon(x, y) {
+	next = new Set()
 	if(map[x + 8] !== undefined && map[x + 8][y + 35] !== undefined) {
-		map[x][y + 24] = true
-		map[x + 1][y + 22] = 1
-		map[x + 1][y + 24] = 1
-		map[x + 2][y + 20] = 1
-		map[x + 2][y + 21] = 1
-		map[x + 2][y + 34] = 1
-		map[x + 2][y + 35] = 1
-		map[x + 2][y + 13] = 1
-		map[x + 2][y + 12] = 1
-		map[x + 3][y + 20] = 1
-		map[x + 3][y + 21] = 1
-		map[x + 3][y + 34] = 1
-		map[x + 3][y + 35] = 1
-		map[x + 3][y + 15] = 1
-		map[x + 3][y + 11] = 1
-		map[x + 4][y + 0] = 1
-		map[x + 4][y + 1] = 1
-		map[x + 4][y + 10] = 1
-		map[x + 4][y + 16] = 1
-		map[x + 4][y + 20] = 1
-		map[x + 4][y + 21] = 1
-		map[x + 5][y + 0] = 1
-		map[x + 5][y + 1] = 1
-		map[x + 5][y + 10] = 1
-		map[x + 5][y + 14] = 1
-		map[x + 5][y + 16] = 1
-		map[x + 5][y + 17] = 1
-		map[x + 5][y + 22] = 1
-		map[x + 5][y + 24] = 1
-		map[x + 6][y + 10] = 1
-		map[x + 6][y + 16] = 1
-		map[x + 6][y + 24] = 1
-		map[x + 7][y + 11] = 1
-		map[x + 7][y + 15] = 1
-		map[x + 8][y + 12] = 1
-		map[x + 8][y + 13] = 1
-		singlePass()
+		next.add([x, y + 24])
+		next.add([x + 1, y + 22])
+		next.add([x + 1, y + 24])
+		next.add([x + 2, y + 20])
+		next.add([x + 2, y + 21])
+		next.add([x + 2, y + 34])
+		next.add([x + 2, y + 35])
+		next.add([x + 2, y + 13])
+		next.add([x + 2, y + 12])
+		next.add([x + 3, y + 20])
+		next.add([x + 3, y + 21])
+		next.add([x + 3, y + 34])
+		next.add([x + 3, y + 35])
+		next.add([x + 3, y + 15])
+		next.add([x + 3, y + 11])
+		next.add([x + 4, y + 0])
+		next.add([x + 4, y + 1])
+		next.add([x + 4, y + 10])
+		next.add([x + 4, y + 16])
+		next.add([x + 4, y + 20])
+		next.add([x + 4, y + 21])
+		next.add([x + 5, y + 0])
+		next.add([x + 5, y + 1])
+		next.add([x + 5, y + 10])
+		next.add([x + 5, y + 14])
+		next.add([x + 5, y + 16])
+		next.add([x + 5, y + 17])
+		next.add([x + 5, y + 22])
+		next.add([x + 5, y + 24])
+		next.add([x + 6, y + 10])
+		next.add([x + 6, y + 16])
+		next.add([x + 6, y + 24])
+		next.add([x + 7, y + 11])
+		next.add([x + 7, y + 15])
+		next.add([x + 8, y + 12])
+		next.add([x + 8, y + 13])
+		updateMap()
+		drawMap()		
 	} else {
 		notify("warning", "pas assez de place", 4000)
 	}
@@ -455,45 +463,47 @@ function drawCanon(x, y) {
 }
 
 function drawReverseCanon(x, y) {
+	next = new Set()
 	if(map[x - 8] !== undefined && map[x - 8][y - 35] !== undefined) {
 
-		map[x][y - 24] = 1
-		map[x - 1][y - 22] = 1
-		map[x - 1][y - 24] = 1
-		map[x - 2][y - 20] = 1
-		map[x - 2][y - 21] = 1
-		map[x - 2][y - 34] = 1
-		map[x - 2][y - 35] = 1
-		map[x - 2][y - 13] = 1
-		map[x - 2][y - 12] = 1
-		map[x - 3][y - 20] = 1
-		map[x - 3][y - 21] = 1
-		map[x - 3][y - 34] = 1
-		map[x - 3][y - 35] = 1
-		map[x - 3][y - 15] = 1
-		map[x - 3][y - 11] = 1
-		map[x - 4][y - 0] = 1
-		map[x - 4][y - 1] = 1
-		map[x - 4][y - 10] = 1
-		map[x - 4][y - 16] = 1
-		map[x - 4][y - 20] = 1
-		map[x - 4][y - 21] = 1
-		map[x - 5][y - 0] = 1
-		map[x - 5][y - 1] = 1
-		map[x - 5][y - 10] = 1
-		map[x - 5][y - 14] = 1
-		map[x - 5][y - 16] = 1
-		map[x - 5][y - 17] = 1
-		map[x - 5][y - 22] = 1
-		map[x - 5][y - 24] = 1
-		map[x - 6][y - 10] = 1
-		map[x - 6][y - 16] = 1
-		map[x - 6][y - 24] = 1
-		map[x - 7][y - 11] = 1
-		map[x - 7][y - 15] = 1
-		map[x - 8][y - 12] = 1
-		map[x - 8][y - 13] = 1
-		singlePass()
+		next.add([x, y - 24])
+		next.add([x - 1, y - 22])
+		next.add([x - 1, y - 24])
+		next.add([x - 2, y - 20])
+		next.add([x - 2, y - 21])
+		next.add([x - 2, y - 34])
+		next.add([x - 2, y - 35])
+		next.add([x - 2, y - 13])
+		next.add([x - 2, y - 12])
+		next.add([x - 3, y - 20])
+		next.add([x - 3, y - 21])
+		next.add([x - 3, y - 34])
+		next.add([x - 3, y - 35])
+		next.add([x - 3, y - 15])
+		next.add([x - 3, y - 11])
+		next.add([x - 4, y - 0])
+		next.add([x - 4, y - 1])
+		next.add([x - 4, y - 10])
+		next.add([x - 4, y - 16])
+		next.add([x - 4, y - 20])
+		next.add([x - 4, y - 21])
+		next.add([x - 5, y - 0])
+		next.add([x - 5, y - 1])
+		next.add([x - 5, y - 10])
+		next.add([x - 5, y - 14])
+		next.add([x - 5, y - 16])
+		next.add([x - 5, y - 17])
+		next.add([x - 5, y - 22])
+		next.add([x - 5, y - 24])
+		next.add([x - 6, y - 10])
+		next.add([x - 6, y - 16])
+		next.add([x - 6, y - 24])
+		next.add([x - 7, y - 11])
+		next.add([x - 7, y - 15])
+		next.add([x - 8, y - 12])
+		next.add([x - 8, y - 13])
+		updateMap()
+		drawMap()	
 	} else {
 		notify("warning", "pas assez de place", 4000)
 	}
@@ -501,126 +511,142 @@ function drawReverseCanon(x, y) {
 }
 
 function drawCanon1(x, y) {
+	next = new Set()
 	if(map[x + 8] !== undefined && map[x + 8][y - 35] !== undefined) {
-		map[x][y - 24] = 1
-		map[x + 1][y - 22] = 1
-		map[x + 1][y - 24] = 1
-		map[x + 2][y - 20] = 1
-		map[x + 2][y - 21] = 1
-		map[x + 2][y - 34] = 1
-		map[x + 2][y - 35] = 1
-		map[x + 2][y - 13] = 1
-		map[x + 2][y - 12] = 1
-		map[x + 3][y - 20] = 1
-		map[x + 3][y - 21] = 1
-		map[x + 3][y - 34] = 1
-		map[x + 3][y - 35] = 1
-		map[x + 3][y - 15] = 1
-		map[x + 3][y - 11] = 1
-		map[x + 4][y - 0] = 1
-		map[x + 4][y - 1] = 1
-		map[x + 4][y - 10] = 1
-		map[x + 4][y - 16] = 1
-		map[x + 4][y - 20] = 1
-		map[x + 4][y - 21] = 1
-		map[x + 5][y - 0] = 1
-		map[x + 5][y - 1] = 1
-		map[x + 5][y - 10] = 1
-		map[x + 5][y - 14] = 1
-		map[x + 5][y - 16] = 1
-		map[x + 5][y - 17] = 1
-		map[x + 5][y - 22] = 1
-		map[x + 5][y - 24] = 1
-		map[x + 6][y - 10] = 1
-		map[x + 6][y - 16] = 1
-		map[x + 6][y - 24] = 1
-		map[x + 7][y - 11] = 1
-		map[x + 7][y - 15] = 1
-		map[x + 8][y - 12] = 1
-		map[x + 8][y - 13] = 1
-		singlePass()
+		next.add([x, y - 24])
+		next.add([x + 1, y - 22])
+		next.add([x + 1, y - 24])
+		next.add([x + 2, y - 20])
+		next.add([x + 2, y - 21])
+		next.add([x + 2, y - 34])
+		next.add([x + 2, y - 35])
+		next.add([x + 2, y - 13])
+		next.add([x + 2, y - 12])
+		next.add([x + 3, y - 20])
+		next.add([x + 3, y - 21])
+		next.add([x + 3, y - 34])
+		next.add([x + 3, y - 35])
+		next.add([x + 3, y - 15])
+		next.add([x + 3, y - 11])
+		next.add([x + 4, y - 0])
+		next.add([x + 4, y - 1])
+		next.add([x + 4, y - 10])
+		next.add([x + 4, y - 16])
+		next.add([x + 4, y - 20])
+		next.add([x + 4, y - 21])
+		next.add([x + 5, y - 0])
+		next.add([x + 5, y - 1])
+		next.add([x + 5, y - 10])
+		next.add([x + 5, y - 14])
+		next.add([x + 5, y - 16])
+		next.add([x + 5, y - 17])
+		next.add([x + 5, y - 22])
+		next.add([x + 5, y - 24])
+		next.add([x + 6, y - 10])
+		next.add([x + 6, y - 16])
+		next.add([x + 6, y - 24])
+		next.add([x + 7, y - 11])
+		next.add([x + 7, y - 15])
+		next.add([x + 8, y - 12])
+		next.add([x + 8, y - 13])
+		updateMap()
+		drawMap()	
 	} else {
 		notify("warning", "pas assez de place", 4000)
 	}
 }
 
 function drawReverseCanon1(x, y) {
+	next = new Set()
 	if(map[x - 8] !== undefined && map[x - 8][y + 35] !== undefined) {
 
-		map[x][y + 24] = 1
-		map[x - 1][y + 22] = 1
-		map[x - 1][y + 24] = 1
-		map[x - 2][y + 20] = 1
-		map[x - 2][y + 21] = 1
-		map[x - 2][y + 34] = 1
-		map[x - 2][y + 35] = 1
-		map[x - 2][y + 13] = 1
-		map[x - 2][y + 12] = 1
-		map[x - 3][y + 20] = 1
-		map[x - 3][y + 21] = 1
-		map[x - 3][y + 34] = 1
-		map[x - 3][y + 35] = 1
-		map[x - 3][y + 15] = 1
-		map[x - 3][y + 11] = 1
-		map[x - 4][y + 0] = 1
-		map[x - 4][y + 1] = 1
-		map[x - 4][y + 10] = 1
-		map[x - 4][y + 16] = 1
-		map[x - 4][y + 20] = 1
-		map[x - 4][y + 21] = 1
-		map[x - 5][y + 0] = 1
-		map[x - 5][y + 1] = 1
-		map[x - 5][y + 10] = 1
-		map[x - 5][y + 14] = 1
-		map[x - 5][y + 16] = 1
-		map[x - 5][y + 17] = 1
-		map[x - 5][y + 22] = 1
-		map[x - 5][y + 24] = 1
-		map[x - 6][y + 10] = 1
-		map[x - 6][y + 16] = 1
-		map[x - 6][y + 24] = 1
-		map[x - 7][y + 11] = 1
-		map[x - 7][y + 15] = 1
-		map[x - 8][y + 12] = 1
-		map[x - 8][y + 13] = 1
-		singlePass()
+		next.add([x, y + 24])
+		next.add([x - 1, y + 22])
+		next.add([x - 1, y + 24])
+		next.add([x - 2, y + 20])
+		next.add([x - 2, y + 21])
+		next.add([x - 2, y + 34])
+		next.add([x - 2, y + 35])
+		next.add([x - 2, y + 13])
+		next.add([x - 2, y + 12])
+		next.add([x - 3, y + 20])
+		next.add([x - 3, y + 21])
+		next.add([x - 3, y + 34])
+		next.add([x - 3, y + 35])
+		next.add([x - 3, y + 15])
+		next.add([x - 3, y + 11])
+		next.add([x - 4, y + 0])
+		next.add([x - 4, y + 1])
+		next.add([x - 4, y + 10])
+		next.add([x - 4, y + 16])
+		next.add([x - 4, y + 20])
+		next.add([x - 4, y + 21])
+		next.add([x - 5, y + 0])
+		next.add([x - 5, y + 1])
+		next.add([x - 5, y + 10])
+		next.add([x - 5, y + 14])
+		next.add([x - 5, y + 16])
+		next.add([x - 5, y + 17])
+		next.add([x - 5, y + 22])
+		next.add([x - 5, y + 24])
+		next.add([x - 6, y + 10])
+		next.add([x - 6, y + 16])
+		next.add([x - 6, y + 24])
+		next.add([x - 7, y + 11])
+		next.add([x - 7, y + 15])
+		next.add([x - 8, y + 12])
+		next.add([x - 8, y + 13])
+		updateMap()
+		drawMap()	
 	} else {
 		notify("warning", "pas assez de place", 4000)
 	}
 }
 
 function drawShip(x, y) {
-	map[x][y + 1] = 1
-	map[x + 1][y + 2] = 1
-	map[x + 2][y] = 1
-	map[x + 2][y + 1] = 1
-	map[x + 2][y + 2] = 1
-	singlePass()
+	next = new Set()
+	next.add([x, y + 1])
+	next.add([x + 1, y + 2])
+	next.add([x + 2, y])
+	next.add([x + 2, y + 1])
+	next.add([x + 2, y + 2])
+	updateMap()
+	drawMap()	
 }
 
 function drawShip1(x, y) {
-	map[x][y + 1] = 1
-	map[x - 1][y + 2] = 1
-	map[x - 2][y] = 1
-	map[x - 2][y + 1] = 1
-	map[x - 2][y + 2] = 1
-	singlePass()
+	next.add([x, y + 1])
+	next.add([x - 1, y + 2])
+	next.add([x - 2, y])
+	next.add([x - 2, y + 1])
+	next.add([x - 2, y + 2])
+	updateMap()
+	drawMap()	
 }
 
 function drawRevShip(x, y) {
-	map[x][y - 1] = 1
-	map[x + 1][y - 2] = 1
-	map[x + 2][y] = 1
-	map[x + 2][y - 1] = 1
-	map[x + 2][y - 2] = 1
-	singlePass()
+	next.add([x, y - 1])
+	next.add([x + 1, y - 2])
+	next.add([x + 2, y])
+	next.add([x + 2, y - 1])
+	next.add([x + 2, y - 2])
+	updateMap()
+	drawMap()	
 }
 
 function drawRevShip1(x, y) {
-	map[x][y - 1] = 1
-	map[x - 1][y - 2] = 1
-	map[x - 2][y] = 1
-	map[x - 2][y - 1] = 1
-	map[x - 2][y - 2] = 1
-	singlePass()
+	next.add([x, y - 1])
+	next.add([x - 1, y - 2])
+	next.add([x - 2, y])
+	next.add([x - 2, y - 1])
+	next.add([x - 2, y - 2])
+	updateMap()
+	drawMap()	
+}
+
+function debugmap(map) {
+	for (let i = 0; i< rows; i++) {
+		console.log(map[i])
+		
+	}	
 }
