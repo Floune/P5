@@ -23,12 +23,6 @@ let status = document.querySelector(".status")
 let iterationDiv = document.querySelector(".iterations")
 let iterations = 0
 
-let gandalf = new Set();
-let naynay = [
-[-1, -1], [-1, 0], [-1, 1],
-[0, -1],		 [0, 1],
-[1, -1], [1, 0], [1, 1]
-]
 //================Listeners==============================================================//
 
 
@@ -118,11 +112,8 @@ function initMap() {
 	}
 	for (let i = 0; i < rows; i++) {
 		for (let j = 0; j < columns; j++) {
-			if (i === 0 || j === 0 || i === rows - 1 || j === columns - 1) {
-				map[i][j] = 0
-			} else {
-				map[i][j] = floor(random(0, 2)) === 0 ? 1 : 0
-			}
+			map[i][j] = floor(random(0, 2)) === 0 ? 1 : 0
+			
 		}
 	}
 }
@@ -173,8 +164,8 @@ function updateMap() {
 //PROUT PROUT PROUTPROUT
 function updateNext() {
 	next = new Set();
-	for (let i = 1; i< rows - 1; i++) {
-		for (let j = 1; j < columns - 1; j++) {
+	for (let i = 0; i< rows; i++) {
+		for (let j = 0; j < columns; j++) {
 			if (checkChange(i, j) === true) {
 				next.add([i, j])
 			} 
@@ -184,45 +175,16 @@ function updateNext() {
 }
 
 
-function checkChange(i, j) { //enfer
-	let neighbours = 0;
-	let newState;
-
-	if (map[i-1][j-1] === 1)
-		neighbours++;
-
-	if (map[i-1][j] === 1)
-		neighbours++;
-
-	if (map[i-1][j+1] === 1)
-		neighbours++;
-
-	if (map[i][j-1] === 1)
-		neighbours++;
-
-	if (map[i][j+1] === 1)
-		neighbours++;
-
-	if (map[i+1][j-1] === 1)
-		neighbours++;
-
-	if (map[i+1][j] === 1)
-		neighbours++;
-
-	if (map[i+1][j+1] === 1)
-		neighbours++;
-
-	if (((map[i][j] == 1) && (neighbours <  2)) || ((map[i][j] == 1) && (neighbours >  3))){
-		newState = 0;
+function checkChange(x, y) {
+	let sum = 0;
+	for (let i = -1; i < 2; i++) {
+		for (let j = -1; j < 2; j++) {
+			sum += map[(x + i + rows) % rows][(y + j + columns) % columns]
+		}
 	}
-	else if ((map[i][j] == false) && (neighbours == 3)){
-		newState = 1;
-	} else {
-		newState = map[i][j]
-	}
-	return map[i][j] !== newState; 
-	
-
+	sum -= map[x][y]
+	newState = (((map[x][y] == 1) && (sum <  2)) || ((map[x][y] == 1) && (sum >  3))) ? 0 : ((map[x][y] == false) && (sum == 3)) ? 1 : map[x][y]
+	return map[x][y] !== newState; 
 }
 
 
