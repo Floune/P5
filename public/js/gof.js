@@ -1,15 +1,17 @@
-let map = new Array();
+let map = new Set();
 let next;
+let started = false;
 let size = 10
 let columns;
 let rows;
-let started = false;
+let fr = 40
+
+const actions = document.querySelectorAll('[data-action]')
+const changes = document.querySelectorAll('[data-change]')
+
 let gridColor = "black"
 let emptyColor = "#2CFE02"
 let fullColor = "black"
-const actions = document.querySelectorAll('[data-action]')
-const changes = document.querySelectorAll('[data-change]')
-let fr = 40
 
 let buffer = new Array()
 let justBeenSet = ["prout", "fesse"];
@@ -21,8 +23,14 @@ let status = document.querySelector(".status")
 let iterationDiv = document.querySelector(".iterations")
 let iterations = 0
 
-
+let gandalf = new Set();
+let naynay = [
+[-1, -1], [-1, 0], [-1, 1],
+[0, -1],		 [0, 1],
+[1, -1], [1, 0], [1, 1]
+]
 //================Listeners==============================================================//
+
 
 actions.forEach(a => {																	 
 	a.addEventListener("click", e => {
@@ -89,9 +97,15 @@ function updateHud() {
 	iterationDiv.innerHTML = iterations
 }
 
-function gen() {
-	columns = floor((window.innerWidth - 50) / size)
-	rows = floor((window.innerHeight - 110) / size)
+function gen(width = null) {
+	if (width) {
+		columns = width
+		rows = width
+	} else {
+		columns = floor((window.innerWidth - 50) / size)
+		rows = floor((window.innerHeight - 110) / size)
+	}
+
 	let mycanvas = createCanvas(size * columns, size * rows);
 	mycanvas.parent("mycanvas");
 	initMap()
@@ -100,11 +114,15 @@ function gen() {
 
 function initMap() {
 	for (let i = 0; i < rows; i ++) {
-		map[i] = new Array(columns)
+		map[i] = new Uint8Array(columns)
 	}
 	for (let i = 0; i < rows; i++) {
 		for (let j = 0; j < columns; j++) {
-			map[i][j] = floor(random(0, 2)) === 0 ? 1 : 0
+			if (i === 0 || j === 0 || i === rows - 1 || j === columns - 1) {
+				map[i][j] = 0
+			} else {
+				map[i][j] = floor(random(0, 2)) === 0 ? 1 : 0
+			}
 		}
 	}
 }
@@ -112,6 +130,7 @@ function initMap() {
 function setup() {
 	noLoop()
 	frameRate(fr)
+	stroke(gridColor)
 	gen()
 }
 
@@ -125,13 +144,7 @@ function draw() {
 
 function drawMap() {
 	next.forEach(n => {
-		if (map[n[0]][n[1]] === 0) {
-			fill(emptyColor)
-		} else {
-			fill(fullColor)	
-
-		}
-		stroke(gridColor)
+		map[n[0]][n[1]] === 0 ? fill(emptyColor) : fill(fullColor)	
 		rect(n[1] * size, n[0] * size, size-1, size-1);		
 	})	
 }
@@ -141,12 +154,7 @@ function drawMap() {
 function drawOnceHorriblePerf() {
 	for (let i = 0; i < rows; i++) {
 		for (let j = 0; j < columns; j++) {
-			if (map[i][j] === 0) {
-				fill(emptyColor)
-			} else {
-				fill(fullColor)	
-
-			}
+			map[i][j] === 0 ? fill(emptyColor) : fill(fullColor)	
 			stroke(gridColor)
 			rect(j * size, i * size, size-1, size-1);		
 		}
@@ -157,15 +165,7 @@ function drawOnceHorriblePerf() {
 function updateMap() {
 	iterations++; 
 	next.forEach(n => {
-		let x = n[0]
-		let y = n[1]
-		if (map[x][y] === 1){
-			map[x][y] = 0;
-
-		}
-		else if (map[x][y] === 0){
-			map[x][y] = 1;
-		}
+		map[n[0]][n[1]] = map[n[0]][n[1]] === 1 ? 0 : 1
 	})
 } 
 
@@ -173,57 +173,44 @@ function updateMap() {
 //PROUT PROUT PROUTPROUT
 function updateNext() {
 	next = new Set();
-	for (let i = 0; i< rows; i++) {
-		for (let j = 0; j < columns; j++) {
+	for (let i = 1; i< rows - 1; i++) {
+		for (let j = 1; j < columns - 1; j++) {
 			if (checkChange(i, j) === true) {
 				next.add([i, j])
 			} 
 		}
 	}
+
 }
+
 
 function checkChange(i, j) { //enfer
 	let neighbours = 0;
 	let newState;
 
-	if (i !== 0 && j !== 0) {
-		if (map[i-1][j-1] === 1)
-			neighbours++;
-	}
-	
-	if (i !== 0) {
-		if (map[i-1][j] === 1)
-			neighbours++;
-	}
+	if (map[i-1][j-1] === 1)
+		neighbours++;
 
-	if (i !== 0 && j !== columns - 1) {
-		if (map[i-1][j+1] === 1)
-			neighbours++;
-	}
+	if (map[i-1][j] === 1)
+		neighbours++;
 
-	if (j !== 0) {
-		if (map[i][j-1] === 1)
-			neighbours++;
-	}
+	if (map[i-1][j+1] === 1)
+		neighbours++;
 
-	if (j !== columns - 1) {
-		if (map[i][j+1] === 1)
-			neighbours++;
-	}
+	if (map[i][j-1] === 1)
+		neighbours++;
 
-	if (i !== rows - 1 && j !== 0) {
-		if (map[i+1][j-1] === 1)
-			neighbours++;
-	}
-	if (i !== rows -1) {
-		if (map[i+1][j] === 1)
-			neighbours++;
-	}
+	if (map[i][j+1] === 1)
+		neighbours++;
 
-	if (i !== rows - 1 && j !== columns - 1) {
-		if (map[i+1][j+1] === 1)
-			neighbours++;
-	}
+	if (map[i+1][j-1] === 1)
+		neighbours++;
+
+	if (map[i+1][j] === 1)
+		neighbours++;
+
+	if (map[i+1][j+1] === 1)
+		neighbours++;
 
 	if (((map[i][j] == 1) && (neighbours <  2)) || ((map[i][j] == 1) && (neighbours >  3))){
 		newState = 0;
@@ -246,8 +233,6 @@ function handleDraw() {
 	pair[1] = floor(mouseX / size)
 
 	if ((pair[0] >= 0 && mouseX <= columns * size) && (pair[1] >= 0 && mouseY <= rows * size)){
-	
-
 		if (justBeenSet[0] != pair[0] || justBeenSet[1] !== pair[1]) {
 			next.add(pair)
 			updateMap()
@@ -340,6 +325,16 @@ function squareSize(e) {
 	}
 }
 
+function boardSize(e) {
+	if (started === false) {
+		iterations = 0;
+		gen(e.value)
+		initMap();
+	} else {
+		notify("warning", "stop to apply", 4000)
+	}
+}
+
 function changeFramerate(e) {
 	frameRate(parseInt(e.value))
 }
@@ -388,9 +383,9 @@ function revship1() {
 
 
 function swapColors() {
-		emptyColor = emptyColor === "#2CFE02" ? "black" : "#2CFE02";
-		fullColor = fullColor === "#2CFE02" ? "black" : "#2CFE02";
-		drawOnceHorriblePerf()
+	emptyColor = emptyColor === "#2CFE02" ? "black" : "#2CFE02";
+	fullColor = fullColor === "#2CFE02" ? "black" : "#2CFE02";
+	drawOnceHorriblePerf()
 }
 
 
